@@ -5,7 +5,7 @@ import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST
 import { useCallback, useState } from "react";
 import { $createHeadingNode } from '@lexical/rich-text';
 
-
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Toolbar = () => {
 
@@ -125,7 +125,7 @@ const Toolbar = () => {
 
     try {
       // 2. 向后端发送请求
-      const response = await fetch("http://127.0.0.1:5000/generate", {
+      const response = await fetch(`${apiUrl}/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -178,7 +178,7 @@ const Toolbar = () => {
   const exportDocument = async () => {
     const userId = localStorage.getItem("userId") || null ;
     try {
-      const response = await fetch(`http://127.0.0.1:5000/export_document?userId=${userId}`);
+      const response = await fetch(`${apiUrl}/export_document?userId=${userId}`);
       if (!response.ok) {
         console.error("❌ 导出 Word 失败");
         return;

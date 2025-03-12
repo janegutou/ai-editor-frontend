@@ -15,6 +15,8 @@ import Toolbar from "./Toolbar";
 import { debounce } from "lodash";
 
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const theme = {
   heading: {
     h1: "editor-h1",
@@ -69,7 +71,7 @@ const EditorContainer = () => {
     console.log("try to load document...")
   
     try {
-      const response = await fetch(`http://127.0.0.1:5000/get_document?user_id=${user_id || ""}`);
+      const response = await fetch(`${apiUrl}/get_document?user_id=${user_id || ""}`);
       const data = await response.json();
       savedContent = data.content;
       user_id = data.user_id;
@@ -100,7 +102,7 @@ const EditorContainer = () => {
     const user_id = localStorage.getItem("userId"); // get user_id from local storage
     console.log("sending content:", content)
     try {
-      const response = await fetch("http://127.0.0.1:5000/save_document", {
+      const response = await fetch(`${apiUrl}/save_document`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
