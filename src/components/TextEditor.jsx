@@ -61,22 +61,19 @@ const EditorContainer = () => {
       const content = JSON.stringify(editorState)
       setEditorContent(content);
       localStorage.setItem(LOCAL_STORAGE_KEY, content);
-      console.log("editorContent", content); // Logs text content on change
+      //console.log("editorContent", content); // Logs text content on change
     });
   }, 1000), [editor]);
   
   const loadDocument = async () => {
     let savedContent = null;
-    let user_id = localStorage.getItem("userId");
     console.log("try to load document...")
   
     try {
-      const response = await fetch(`${apiUrl}/get_document?user_id=${user_id || ""}`);
+      const response = await fetch(`${apiUrl}/get_document`);
       const data = await response.json();
       savedContent = data.content;
-      user_id = data.user_id;
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
-      localStorage.setItem("userId", user_id); 
     } catch (error) {
       console.error("❌ 服务器加载文档失败", error);
       savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 尝试加载本地缓存
@@ -99,15 +96,13 @@ const EditorContainer = () => {
 
   const saveDocument = async () => {  // when needed save document to both local storage and server
     const content = localStorage.getItem(LOCAL_STORAGE_KEY);
-    const user_id = localStorage.getItem("userId"); // get user_id from local storage
-    console.log("sending content:", content)
+    //console.log("sending content:", content)
     try {
       const response = await fetch(`${apiUrl}/save_document`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          "content": content,
-          "user_id": user_id }),
+          "content": content}),
       });
       
       if (response.ok) {
@@ -122,11 +117,6 @@ const EditorContainer = () => {
     loadDocument(); // load document
 
     const handleSave = () => {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        console.log("先登录才能save");
-        return;
-      };
       console.log("save document triggered by useEffect");
       saveDocument();
     };
@@ -144,15 +134,15 @@ const EditorContainer = () => {
 
 
   return (
-    <div className="w-full max-w-5xl mx-auto bg-white border border-gray-300 rounded-lg shadow-md p-4">
+    <div className="w-full max-w-5xl mx-auto bg-white p-6">
       <Toolbar />
       <ListPlugin /> 
       <div className="relative">
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="w-full min-h-[200px] outline-none text-gray-900 text-lg leading-6 p-2" />
+            <ContentEditable className="w-full min-h-[200px] outline-none text-gray-900 text-lg leading-6 pt-6 p-2" />
           }
-          placeholder={<div className="absolute top-2 left-2 text-gray-400">Start writing...</div>}
+          placeholder={<div className="absolute top-6 left-2 text-gray-400">Start writing...</div>}
         />
       </div>
       <OnChangePlugin onChange={onChange} />

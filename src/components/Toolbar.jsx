@@ -4,6 +4,8 @@ import { $getSelection, $isRangeSelection, UNDO_COMMAND,  REDO_COMMAND, $createP
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND } from "@lexical/list";
 import { useCallback, useState } from "react";
 import { $createHeadingNode } from '@lexical/rich-text';
+import { FaBold, FaItalic, FaUnderline, FaStrikethrough, FaHeading, FaListUl, FaListOl, FaUndo, FaRedo, FaDownload, FaExpand, FaPlay } from "react-icons/fa";
+import { head } from "lodash";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -11,21 +13,6 @@ const Toolbar = () => {
 
   const [prompt, setPrompt] = useState(""); // 用户自定义 prompt
   const [editor] = useLexicalComposerContext();
-
-  const getIcon = (format) => {
-    switch (format) {
-      case 'bold':
-        return <FontBoldIcon />;
-      case 'italic':
-        return <FontItalicIcon />;
-      case 'strikethrough':
-        return <StrikethroughIcon />;
-      case 'underline':
-        return <UnderlineIcon />;
-      default:
-        return null;
-    }
-  };
 
   const applyFormat = (format) => {
     editor.update(() => {
@@ -40,19 +27,72 @@ const Toolbar = () => {
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createHeadingNode(tag));
+        const nodes = selection.getNodes();
+        if (nodes.length > 0) {
+          const blockNode = nodes[0].getParent();
+
+          if (blockNode) {
+            const blockType = blockNode.getType();
+            //console.log("blockType:", blockType);  // Log block type
+
+            if (blockType === "heading") {
+              //  get the tag of the current heading
+              const headingTag = blockNode.getTag(); // h1, h2, h3, etc.
+            
+              if (headingTag === tag) {
+                $setBlocksType(selection, () => $createParagraphNode());
+              } else {
+                $setBlocksType(selection, () => $createHeadingNode(tag));
+              }
+            } else {
+              // set the heading tag
+              $setBlocksType(selection, () => $createHeadingNode(tag));
+            }
+          }
+        }
       }
     });
   };
 
   const insertList = (listType) => {
-    console.log(listType);
-    editor.dispatchCommand(listType === "bullet" ? INSERT_UNORDERED_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND, undefined);
-  };
+    editor.update(() => {    
+      const selection = $getSelection();
+      const nodes = selection.getNodes();
+  
+      // Ensure there's a selection and the selected nodes are not empty
+      if (nodes.length > 0) {
+        const blockNode = nodes[0].getParent(); // Get the parent block node
+  
+        if (blockNode) {
+          const blockType = blockNode.getType();
+          //console.log("blockType:", blockType);  // Log block type, if list of not
+          
+        if (blockType === "listitem") {
+          const parentListNode = blockNode.getParent();
+          const parentListTag = parentListNode?.getTag(); // ol or ul
 
-  const removeList = useCallback(() => {
-    editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
-  }, [editor]);
+          if (parentListTag === listType) {
+            // If it's already the same list type, remove the list
+            editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+          } else {
+            // Change the list type (bullet vs ordered)
+            editor.dispatchCommand(
+              listType === "ul" ? INSERT_UNORDERED_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND,
+              undefined
+            );
+          }
+        } else {
+          // If it's not a list item, insert a new list
+          editor.dispatchCommand(
+            listType === "ul" ? INSERT_UNORDERED_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND,
+            undefined
+          );
+        }
+      }
+    }
+  });
+};
+
 
   const undo = () => editor.dispatchCommand(UNDO_COMMAND, undefined);
   const redo = () => editor.dispatchCommand(REDO_COMMAND, undefined);
@@ -176,9 +216,8 @@ const Toolbar = () => {
   };
 
   const exportDocument = async () => {
-    const userId = localStorage.getItem("userId") || null ;
     try {
-      const response = await fetch(`${apiUrl}/export_document?userId=${userId}`);
+      const response = await fetch(`${apiUrl}/export_document`);
       if (!response.ok) {
         console.error("❌ 导出 Word 失败");
         return;
@@ -198,36 +237,36 @@ const Toolbar = () => {
   };
 
   return (
-    <div className="flex space-x-2 border-b border-gray-300 p-2 bg-gray-100 rounded-t-lg">
+    <div className="flex border-b border-gray-300 p-2 bg-gray-100 h-16 overflow-x-auto sticky no-scrollbar">
       {/* AI 交互部分 */}
       <div className="flex space-x-2">
-        <button className="toolbar-btn" onClick={() => generateAIContent("expand")}>E</button>
-        <button className="toolbar-btn" onClick={() => generateAIContent("continue")}>C</button>
+        <button className="toolbar-btn" onClick={() => generateAIContent("expand")}><FaExpand /></button>
+        <button className="toolbar-btn" onClick={() => generateAIContent("continue")}><FaPlay /></button>
       </div>
 
       {/* 自定义 Prompt 输入框 */}
       <textarea
-        className="w-full p-2 border rounded-md"
+        className="w-full max-w-[250px] p-1 border rounded-md text-sm mr-2 ml-2"
         placeholder="custom prompt"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />
 
+      <div className="w-px bg-gray-300 mx-2"></div>
+
       {/* 其他文本编辑功能 */}
       <div className="flex space-x-2">
-        <button className="toolbar-btn" onClick={() => applyFormat("bold")}>B</button>
-        <button className="toolbar-btn" onClick={() => applyFormat("italic")}>I</button>
-        <button className="toolbar-btn" onClick={() => applyFormat("underline")}>U</button>
-        <button className="toolbar-btn" onClick={() => applyFormat("strikethrough")}>S</button>
-        <button className="toolbar-btn" onClick={() => setBlock("h1")}>H1</button>
-        <button className="toolbar-btn" onClick={() => setBlock("h2")}>H2</button>
-        <button className="toolbar-btn" onClick={() => setBlock("h3")}>H3</button>
-        <button className="toolbar-btn" onClick={() => insertList("bullet")}>• List</button>
-        <button className="toolbar-btn" onClick={() => insertList("number")}>1. List</button>
-        <button className="toolbar-btn" onClick={removeList}>Remove List</button>
-        <button className="toolbar-btn" onClick={undo}>↺ Undo</button>
-        <button className="toolbar-btn" onClick={redo}>↻ Redo</button>
-        <button className="toolbar-btn" onClick={exportDocument}>Download</button>
+        <button className="toolbar-btn" onClick={() => applyFormat("bold")}><FaBold /></button>
+        <button className="toolbar-btn" onClick={() => applyFormat("italic")}><FaItalic /></button>
+        <button className="toolbar-btn" onClick={() => applyFormat("underline")}><FaUnderline /></button>
+        <button className="toolbar-btn" onClick={() => applyFormat("strikethrough")}><FaStrikethrough /></button>
+        <button className="toolbar-btn" onClick={() => setBlock("h1")}><FaHeading /><span className="text-xs">1</span></button>
+        <button className="toolbar-btn" onClick={() => setBlock("h2")}><FaHeading /><span className="text-xs">2</span></button>
+        <button className="toolbar-btn" onClick={() => insertList("ul")}><FaListUl /></button>
+        <button className="toolbar-btn" onClick={() => insertList("ol")}><FaListOl /></button>
+        <button className="toolbar-btn" onClick={undo}><FaUndo /></button>
+        <button className="toolbar-btn" onClick={redo}><FaRedo /></button>
+        <button className="toolbar-btn" onClick={exportDocument}><FaDownload /></button>
       </div>
     </div>
   );
