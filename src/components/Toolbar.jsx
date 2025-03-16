@@ -165,9 +165,11 @@ const Toolbar = () => {
 
     try {
       // 2. 向后端发送请求
+      const token = localStorage.getItem("supabaseToken");
       const response = await fetch(`${apiUrl}/generate`, {
         method: "POST",
         headers: {
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -216,8 +218,15 @@ const Toolbar = () => {
   };
 
   const exportDocument = async () => {
+    const token = localStorage.getItem("supabaseToken");
     try {
-      const response = await fetch(`${apiUrl}/export_document`);
+      const response = await fetch(`${apiUrl}/export_document`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },        
+      });
       if (!response.ok) {
         console.error("❌ 导出 Word 失败");
         return;

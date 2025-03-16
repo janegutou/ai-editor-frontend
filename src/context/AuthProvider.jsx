@@ -9,14 +9,24 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Listen for auth changes
+
+    // Check if user is already signed in (with token in local storage), if so, set header using this token
+    //const token = localStorage.getItem("supabaseToken");
+    //if (token) {
+    //  supabase.auth.setAuth(token); // set auth headers for api requests
+    //}
+
+    // Listen for auth changes (e.g. user signin, signout, token refresh, etc.)
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
           setUser(session.user);
-          await ensureUserInDatabase(session.user.id); 
+          localStorage.setItem("supabaseToken", session.access_token); // save token to local storage
+          console.log("User is signed in: ", session.user.id)
+          await ensureUserInDatabase(); 
         } else {
           setUser(null);
+          localStorage.removeItem("supabaseToken"); // remove token from local storage when user signs out
         }
       }
     );
@@ -32,6 +42,7 @@ export function AuthProvider({ children }) {
     if (error) {
       console.error("Error signing out:", error.message);
     }
+    localStorage.removeItem("supabaseToken"); // remove token from local storage when user signs out
   };  
 
   const signInWithGithub = async () => {
@@ -42,15 +53,23 @@ export function AuthProvider({ children }) {
     if (error) console.error("Login Error:", error.message);
   };
 
-  // call backend to ensure user is in database
-  async function ensureUserInDatabase(userId) {
+
+  async function ensureUserInDatabase() {
+    const token = localStorage.getItem("supabaseToken");
+
+    if (!token) {
+      console.error("No token found in local storage");
+      return;
+    }
+
+
     try {
       const response = await fetch(`${apiUrl}/ensure_user`, {
         method: "POST",
         headers: {
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({user_id: userId}),
       });
 
       if (!response.ok) {

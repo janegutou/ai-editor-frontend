@@ -58,7 +58,7 @@ const EditorContainer = () => {
     editorState.read(() => {
       //const content = $getRoot().getTextContent();
       //const content = $generateHtmlFromNodes(editor, null);
-      const content = JSON.stringify(editorState)
+      const content = JSON.stringify(editorState) // convert editor state type (ob) to string for local storage
       setEditorContent(content);
       localStorage.setItem(LOCAL_STORAGE_KEY, content);
       //console.log("editorContent", content); // Logs text content on change
@@ -68,9 +68,16 @@ const EditorContainer = () => {
   const loadDocument = async () => {
     let savedContent = null;
     console.log("try to load document...")
+    const token = localStorage.getItem("supabaseToken");
   
     try {
-      const response = await fetch(`${apiUrl}/get_document`);
+      const response = await fetch(`${apiUrl}/get_document`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       savedContent = data.content;
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
@@ -96,11 +103,16 @@ const EditorContainer = () => {
 
   const saveDocument = async () => {  // when needed save document to both local storage and server
     const content = localStorage.getItem(LOCAL_STORAGE_KEY);
-    //console.log("sending content:", content)
+    const token = localStorage.getItem("supabaseToken");
+    console.log("sending content:", content);
+    console.log("sending content type:", typeof content);
     try {
       const response = await fetch(`${apiUrl}/save_document`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ 
           "content": content}),
       });
