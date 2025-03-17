@@ -180,7 +180,7 @@ const Toolbar = () => {
       const data = await response.json();
       
       // 3. 插入生成的文本
-      if (data.generated_text) {    
+      if (data.generated_text) {
         editor.update(() => {
           const selection = $getSelection();
 
@@ -202,6 +202,7 @@ const Toolbar = () => {
             node.insertAfter(newParagraph);
           }
         });
+        localStorage.setItem("remainingTokens", data.tokens);   // update remaining tokens to local storage
       } else {
         console.log("No generated text");
       }

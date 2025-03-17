@@ -104,8 +104,8 @@ const EditorContainer = () => {
   const saveDocument = async () => {  // when needed save document to both local storage and server
     const content = localStorage.getItem(LOCAL_STORAGE_KEY);
     const token = localStorage.getItem("supabaseToken");
-    console.log("sending content:", content);
-    console.log("sending content type:", typeof content);
+    //console.log("sending content:", content);
+    //console.log("sending content type:", typeof content);
     try {
       const response = await fetch(`${apiUrl}/save_document`, {
         method: "POST",

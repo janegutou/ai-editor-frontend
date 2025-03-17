@@ -62,7 +62,6 @@ export function AuthProvider({ children }) {
       return;
     }
 
-
     try {
       const response = await fetch(`${apiUrl}/ensure_user`, {
         method: "POST",
@@ -75,6 +74,10 @@ export function AuthProvider({ children }) {
       if (!response.ok) {
         console.error("Failed to ensure user in database");
       }
+
+      const data = await response.json();
+      console.log("User details stored in local storage:", data);
+      localStorage.setItem("remainingTokens", data.tokens); // 同步本地缓存, can add others when needed
     } catch (error) {
       console.error(error);
     }
