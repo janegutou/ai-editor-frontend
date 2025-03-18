@@ -9,7 +9,7 @@ import { head } from "lodash";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const Toolbar = () => {
+const Toolbar = ({selectedModel}) => {
 
   const [prompt, setPrompt] = useState(""); // 用户自定义 prompt
   const [editor] = useLexicalComposerContext();
@@ -175,7 +175,8 @@ const Toolbar = () => {
         body: JSON.stringify({
           context_text: contextText, 
           selected_mode: selectedMode, 
-          prompt: prompt}),
+          prompt: prompt, 
+          model: selectedModel}),
       });
       const data = await response.json();
       

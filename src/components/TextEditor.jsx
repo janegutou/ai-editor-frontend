@@ -48,7 +48,7 @@ const initialConfig = {
 };
 
 
-const EditorContainer = () => {
+const EditorContainer = ({selectedModel}) => {
 
   const [editor] = useLexicalComposerContext();
   const [editorContent, setEditorContent] = useState("");
@@ -147,7 +147,7 @@ const EditorContainer = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto bg-white p-6">
-      <Toolbar />
+      <Toolbar selectedModel={selectedModel} />
       <ListPlugin /> 
       <div className="relative">
         <RichTextPlugin
