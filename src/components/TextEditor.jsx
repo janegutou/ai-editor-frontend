@@ -48,7 +48,7 @@ const initialConfig = {
 };
 
 
-const EditorContainer = ({selectedModel}) => {
+const EditorContainer = ({userOptions, toggleCustomize}) => {
 
   const [editor] = useLexicalComposerContext();
   const [editorContent, setEditorContent] = useState("");
@@ -147,7 +147,7 @@ const EditorContainer = ({selectedModel}) => {
 
   return (
     <div className="w-full max-w-5xl mx-auto bg-white p-6">
-      <Toolbar selectedModel={selectedModel} />
+      <Toolbar userOptions={userOptions} toggleCustomize={toggleCustomize}/>
       <ListPlugin /> 
       <div className="relative">
         <RichTextPlugin
@@ -165,10 +165,10 @@ const EditorContainer = ({selectedModel}) => {
 };
 
 
-export default function TextEditor() {
+export default function TextEditor({userOptions, toggleCustomize}) {
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <EditorContainer />
+      <EditorContainer userOptions={userOptions} toggleCustomize={toggleCustomize}/>
     </LexicalComposer>
   );
 }

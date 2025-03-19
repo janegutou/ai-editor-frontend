@@ -5,13 +5,12 @@ import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST
 import { useCallback, useState } from "react";
 import { $createHeadingNode } from '@lexical/rich-text';
 import { FaBold, FaItalic, FaUnderline, FaStrikethrough, FaHeading, FaListUl, FaListOl, FaUndo, FaRedo, FaDownload, FaExpand, FaPlay } from "react-icons/fa";
-import { head } from "lodash";
+import { FaMagic, FaFileAlt, FaPlusCircle, FaAngleDoubleRight, FaRegLightbulb, FaLightbulb, FaRocket, FaCog } from "react-icons/fa";
+
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const Toolbar = ({selectedModel}) => {
-
-  const [prompt, setPrompt] = useState(""); // 用户自定义 prompt
+const Toolbar = ({userOptions, toggleCustomize}) => {
   const [editor] = useLexicalComposerContext();
 
   const applyFormat = (format) => {
@@ -175,8 +174,12 @@ const Toolbar = ({selectedModel}) => {
         body: JSON.stringify({
           context_text: contextText, 
           selected_mode: selectedMode, 
-          prompt: prompt, 
-          model: selectedModel}),
+          model: userOptions.selectedModel,
+          tone: userOptions.tone,
+          style: userOptions.style,
+          audience: userOptions.audience,
+          customer_prompt: userOptions.customerPrompt,
+        }),
       });
       const data = await response.json();
       
@@ -251,19 +254,13 @@ const Toolbar = ({selectedModel}) => {
     <div className="flex border-b border-gray-300 p-2 bg-gray-100 h-16 overflow-x-auto sticky no-scrollbar">
       {/* AI 交互部分 */}
       <div className="flex space-x-2">
-        <button className="toolbar-btn" onClick={() => generateAIContent("expand")}><FaExpand /></button>
-        <button className="toolbar-btn" onClick={() => generateAIContent("continue")}><FaPlay /></button>
+        <button className="toolbar-btn" title="Polish the text" onClick={() => generateAIContent("polish")}><FaMagic /></button>
+        <button className="toolbar-btn" title="Expand the text" onClick={() => generateAIContent("expand")}><FaFileAlt /></button>
+        <button className="toolbar-btn" title="Continue writing" onClick={() => generateAIContent("continue")}><FaLightbulb /></button>
+        <button className="toolbar-btn" title="Custom prompt" onClick={() => toggleCustomize(true)}><FaCog /></button>
       </div>
 
-      {/* 自定义 Prompt 输入框 */}
-      <textarea
-        className="w-full max-w-[250px] p-1 border rounded-md text-sm mr-2 ml-2"
-        placeholder="custom prompt"
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-      />
-
-      <div className="w-px bg-gray-300 mx-2"></div>
+      <div className="w-px bg-gray-300 mx-4"></div>
 
       {/* 其他文本编辑功能 */}
       <div className="flex space-x-2">
