@@ -226,7 +226,7 @@ const Toolbar = ({userOptions, toggleCustomize}) => {
     const token = localStorage.getItem("supabaseToken");
     try {
       const response = await fetch(`${apiUrl}/export_document`, {
-        method: "POST",
+        method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",

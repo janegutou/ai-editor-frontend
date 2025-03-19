@@ -80,6 +80,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       });
       const data = await response.json();
       savedContent = data.content;
+      console.log("✅ 服务器加载文档成功！");
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
     } catch (error) {
       console.error("❌ 服务器加载文档失败", error);

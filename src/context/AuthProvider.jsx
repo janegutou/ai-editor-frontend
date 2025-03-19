@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
       }
 
       const data = await response.json();
-      console.log("User details stored in local storage:", data);
+      //console.log("User details stored in local storage:", data);
       localStorage.setItem("remainingTokens", data.tokens); // 同步本地缓存, can add others when needed
     } catch (error) {
       console.error(error);
