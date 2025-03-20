@@ -9,8 +9,6 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin"; 
 import { HeadingNode } from "@lexical/rich-text"; 
 import { ListItemNode, ListNode } from "@lexical/list"; 
-import { $getRoot } from "lexical";
-import { $generateNodesFromDOM, $generateHtmlFromNodes } from "@lexical/html";
 import Toolbar from "./Toolbar";
 import { debounce } from "lodash";
 
@@ -52,18 +50,17 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
   const [editor] = useLexicalComposerContext();
   const [editorContent, setEditorContent] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
   const LOCAL_STORAGE_KEY = "editorContent"; // temporary storage key
 
   const onChange = useCallback(debounce((editorState) => { // will handle shorttime storage via local storage
     editorState.read(() => {
-      //const content = $getRoot().getTextContent();
-      //const content = $generateHtmlFromNodes(editor, null);
       const content = JSON.stringify(editorState) // convert editor state type (ob) to string for local storage
       setEditorContent(content);
       localStorage.setItem(LOCAL_STORAGE_KEY, content);
       //console.log("editorContent", content); // Logs text content on change
     });
-  }, 1000), [editor]);
+  }, 1000), [editor]); // 每1秒存储一次内容到本地缓存
   
   const loadDocument = async () => {
     let savedContent = null;
@@ -84,7 +81,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
     } catch (error) {
       console.error("❌ 服务器加载文档失败", error);
-      savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 尝试加载本地缓存
+      //savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 不再尝试加载本地缓存
     }
   
     if (savedContent) {
@@ -127,23 +124,37 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   };
 
   useEffect(() => {
-    loadDocument(); // load document
-
+    // load document
+    const loadAndSetFlag = async () => {
+      await loadDocument(); 
+      setIsLoaded(true);
+    };
+    loadAndSetFlag();
+   
     const handleSave = () => {
-      console.log("save document triggered by useEffect");
-      saveDocument();
+      if (isLoaded) {
+        console.log("save document triggered by useEffect");
+        saveDocument();
+      }
     };
 
     window.addEventListener("beforeunload", handleSave); // save document on window close event
     window.addEventListener("visibilitychange", handleSave); // save document on tab change
-    window.addEventListener("online", handleSave); // save document on back online event
+
+    // save every 5 minutes
+    const autoSaveInterval = setInterval(() => {
+      handleSave();
+    }, 5 * 60 * 1000); 
     
     return () => {
+      if (isLoaded) {
+        handleSave(); // save document on unmount
+      };
       window.removeEventListener("beforeunload", handleSave);
-      window.removeEventListener("online", handleSave);
       window.removeEventListener("visibilitychange", handleSave);
+      clearInterval(autoSaveInterval);
     };
-  }, [editor]);
+  }, [editor, isLoaded]);
 
 
   return (
