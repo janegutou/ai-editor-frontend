@@ -24,10 +24,12 @@ const Login = () => {
         console.log("User signed up:", user);
       }
     } else {
-      // Sign in with email and password
+      // Sign/log in with email and password
       const { user, error } = await signInWithEmail(email, password);
       if (error) {
         console.error("Login error:", error);
+        // show error message to user
+        alert(error);
       } else {
         console.log("User logged in:", user);
       }
@@ -87,7 +89,7 @@ const Login = () => {
             />
             <button
                 onClick={handleSubmit}
-                className={`w-full h-12 bg-blue-500 hover:bg-blue-400 mt-4 text-white p-2 rounded-xl ${!email && "opacity-50 cursor-not-allowed"}`}
+                className={`w-full h-12 bg-blue-500 hover:bg-blue-400 mt-4 text-white p-2 rounded-xl ${(!email || !password) && "opacity-50 cursor-not-allowed"}`}
                 disabled={!email || !password}
             >
                 Continue
@@ -104,7 +106,7 @@ const Login = () => {
             </div>
 
             {/* Toggle between Sign-Up and Login */}
-            <div className="flex justify-center mt-4 pb-4 text-sm text-gray-500">
+            <div className="flex justify-center mt-4 pb-2 text-sm text-gray-500">
               <span>
                 {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
                 <button
