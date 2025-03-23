@@ -1,35 +1,35 @@
 import { use, useState, useEffect } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { set } from "lodash";
 
 
 const Login = () => {
-  const { user, signInWithGithub, signInWithEmail, signUpWithEmail, resetPassword } = useAuth();
+  const { user, signInWithGithub, signInWithEmail, signUpWithEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false); // Toggle for sign-up and login
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     if (!email || !password) return;
 
-    if (isSignUp) {
-      // Sign up with email and password
+    setErrorMessage("");
+
+    if (isSignUp) {  // Sign up with email and password
       const { user, error } = await signUpWithEmail(email, password);
       if (error) {
-        console.error("Sign-up error:", error);
+        setErrorMessage(error);
       } else {
         console.log("User signed up:", user);
       }
-    } else {
-      // Sign/log in with email and password
+    } else {   // Sign/log in with email and password
       const { user, error } = await signInWithEmail(email, password);
       if (error) {
-        console.error("Login error:", error);
-        // show error message to user
-        alert(error);
+        setErrorMessage(error);
       } else {
         console.log("User logged in:", user);
       }
@@ -95,8 +95,14 @@ const Login = () => {
                 Continue
             </button>
 
+            {/* Error Message */} 
+              <div className="mt-4 text-center font-bold text-red-500">
+                <p>{errorMessage || "\u00A0"}</p>
+              </div>
+            
+
             {/* Forgot Password Link */}
-            <div className="text-center pt-2 mt-4">
+            <div className="mt-4">
               <button
                 onClick={() => navigate("/forgot-password")}
                 className="text-sm text-blue-500 hover:underline"
@@ -106,7 +112,7 @@ const Login = () => {
             </div>
 
             {/* Toggle between Sign-Up and Login */}
-            <div className="flex justify-center mt-4 pb-2 text-sm text-gray-500">
+            <div className="flex mt-4 pb-2 text-sm text-gray-500">
               <span>
                 {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
                 <button

@@ -55,22 +55,30 @@ export function AuthProvider({ children }) {
 
   // 邮箱密码注册
   const signUpWithEmail = async (email, password) => {
-    const { user, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ 
+      email: email,
+      password: password,
+    });
     if (error) {
       console.error("Error signing up:", error.message);
       return {error: error.message};
-    }
-    return {user};
+    } else if (data.user && data.user.identities && data.user.identities.length === 0) {
+      return {error: "Email already exists"};
+    };
+    return {user: data.user};
   };
 
   // 邮箱密码登录
   const signInWithEmail = async (email, password) => {
-    const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ 
+      email: email,
+      password: password,
+    });
     if (error) {
       console.error("Login Error:", error.message);
       return {error: error.message};
     }
-    return {user};
+    return {user: data.user};
   };
 
   const resetPassword = async (email) => {
