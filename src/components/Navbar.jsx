@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthProvider";
 import { FaSignOutAlt } from "react-icons/fa";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 
 const Navbar = () => {
-  const { user, signInWithGithub, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [tokens, setTokens] = useState( localStorage.getItem("remainingTokens") || null);
 
@@ -13,8 +14,13 @@ const Navbar = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const hideLoginButton = ["/login", "/forgot-password"].includes(location.pathname);
+
   return (
-    <nav className="bg-gray-800 text-white px-6 py-3 flex justify-between items-center">
+    <nav className="px-6 py-2 flex justify-between items-center border-b">
       {/* 左侧 Logo + 名称 */}
       <div className="flex items-center space-x-2">
         <img src="/logo.png" alt="Logo" className="h-8 w-8" />
@@ -29,7 +35,7 @@ const Navbar = () => {
             <div className="flex items-center">
               <button
                 onClick={handleMenuToggle}
-                className="w-10 h-10 bg-orange-500 hover:bg-orange-600 flex items-center justify-center rounded-full text-lg font-bold cursor-pointer"
+                className="w-10 h-10 text-white bg-orange-500 hover:bg-orange-600 flex items-center justify-center rounded-full text-lg font-bold cursor-pointer"
               >
                 {user.email.charAt(0).toUpperCase()}
               </button>
@@ -52,12 +58,14 @@ const Navbar = () => {
             )}
           </div>
         ) : (
-          <button
-            onClick={signInWithGithub}
-            className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded"
-          >
-            Login with GitHub
-          </button>
+          !hideLoginButton && (
+            <button
+              onClick={() => navigate("/login")}
+              className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-2xl text-white font-bold bg-orange-500 hover:bg-orange-600"
+            >
+              Log In
+            </button>
+          )
         )}
       </div>
     </nav>

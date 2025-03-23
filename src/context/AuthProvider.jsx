@@ -53,6 +53,49 @@ export function AuthProvider({ children }) {
     if (error) console.error("Login Error:", error.message);
   };
 
+  // 邮箱密码注册
+  const signUpWithEmail = async (email, password) => {
+    const { user, error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      console.error("Error signing up:", error.message);
+      return {error: error.message};
+    }
+    return {user};
+  };
+
+  // 邮箱密码登录
+  const signInWithEmail = async (email, password) => {
+    const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      console.error("Login Error:", error.message);
+      return {error: error.message};
+    }
+    return {user};
+  };
+
+  const resetPassword = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      console.error("Error resetting password:", error.message);
+      return {error: error.message};
+    }
+  };
+
+  const signInWithMagicLink = async (email) => { 
+    const { error } = await supabase.auth.signInWithOtp({
+      email, 
+      options: {
+        shouldCreateUser: true, // 允许自动注册
+        emailRedirectTo: "https://ai-editor-frontend.vercel.app", // 替换成你的正式域名
+      },
+    });
+    if (error) {
+      console.error("Login Error:", error.message);
+      return {error: error.message};
+    }
+    return {success: "Check your email for the login link!"};
+  };
+
 
   async function ensureUserInDatabase() {
     const token = localStorage.getItem("supabaseToken");
@@ -85,7 +128,7 @@ export function AuthProvider({ children }) {
 
 
   return (
-    <AuthContext.Provider value={{ user, signInWithGithub, signOut }}>
+    <AuthContext.Provider value={{ user, signInWithGithub, signUpWithEmail, signInWithEmail, resetPassword, signInWithMagicLink, signOut }}>
       {children}
     </AuthContext.Provider>
   );

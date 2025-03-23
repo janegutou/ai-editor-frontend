@@ -6,11 +6,12 @@ import { useCallback, useState } from "react";
 import { $createHeadingNode } from '@lexical/rich-text';
 import { FaBold, FaItalic, FaUnderline, FaStrikethrough, FaHeading, FaListUl, FaListOl, FaUndo, FaRedo, FaDownload, FaExpand, FaPlay } from "react-icons/fa";
 import { FaMagic, FaFileAlt, FaPlusCircle, FaAngleDoubleRight, FaRegLightbulb, FaLightbulb, FaRocket, FaCog } from "react-icons/fa";
+import { set } from "lodash";
 
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-const Toolbar = ({userOptions, toggleCustomize}) => {
+const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   const [editor] = useLexicalComposerContext();
 
   const applyFormat = (format) => {
@@ -92,10 +93,8 @@ const Toolbar = ({userOptions, toggleCustomize}) => {
   });
 };
 
-
   const undo = () => editor.dispatchCommand(UNDO_COMMAND, undefined);
   const redo = () => editor.dispatchCommand(REDO_COMMAND, undefined);
-
   
   const getEditorText = () => {  // 获取编辑器文本，并插入标记
     let fullText = "";
@@ -158,6 +157,8 @@ const Toolbar = ({userOptions, toggleCustomize}) => {
   };
 
   const generateAIContent = async (selectedMode) => {
+    showMessage("loading", "AI is generating...");
+
     // 1. 获取文本
     const contextText = getEditorText();
     //console.log(contextText);
@@ -211,14 +212,8 @@ const Toolbar = ({userOptions, toggleCustomize}) => {
         console.log("No generated text");
       }
     } catch (error) {
-      console.error(error);
-      if (error.response) {
-        console.error(error.response.data.error);
-      } else if (error.request) {
-        console.error(error.request);
-      } else {
-        console.error("Something went wrong");
-      }
+      console.error("Error:",error);
+      showMessage("error", "Failed to generate content.");
     }
   };
 
@@ -250,31 +245,34 @@ const Toolbar = ({userOptions, toggleCustomize}) => {
     }
   };
 
+
   return (
-    <div className="flex border-b border-gray-300 p-2 bg-gray-100 h-16 overflow-x-auto sticky no-scrollbar">
-      {/* AI 交互部分 */}
-      <div className="flex space-x-2">
-        <button className="toolbar-btn" title="Polish the text" onClick={() => generateAIContent("polish")}><FaMagic /></button>
-        <button className="toolbar-btn" title="Expand the text" onClick={() => generateAIContent("expand")}><FaFileAlt /></button>
-        <button className="toolbar-btn" title="Continue writing" onClick={() => generateAIContent("continue")}><FaLightbulb /></button>
-        <button className="toolbar-btn" title="Custom prompt" onClick={() => toggleCustomize(true)}><FaCog /></button>
-      </div>
+    <div>
+      <div className="flex border-b border-gray-300 p-2 bg-gray-100 h-16 overflow-x-auto sticky no-scrollbar">
+        {/* AI 交互部分 */}
+        <div className="flex space-x-2">
+          <button className="toolbar-btn" title="Polish the text" onClick={() => generateAIContent("polish")}><FaMagic /></button>
+          <button className="toolbar-btn" title="Expand the text" onClick={() => generateAIContent("expand")}><FaFileAlt /></button>
+          <button className="toolbar-btn" title="Continue writing" onClick={() => generateAIContent("continue")}><FaLightbulb /></button>
+          <button className="toolbar-btn" title="Custom prompt" onClick={() => toggleCustomize(true)}><FaCog /></button>
+        </div>
 
-      <div className="w-px bg-gray-300 mx-4"></div>
+        <div className="w-px bg-gray-300 mx-4"></div>
 
-      {/* 其他文本编辑功能 */}
-      <div className="flex space-x-2">
-        <button className="toolbar-btn" onClick={() => applyFormat("bold")}><FaBold /></button>
-        <button className="toolbar-btn" onClick={() => applyFormat("italic")}><FaItalic /></button>
-        <button className="toolbar-btn" onClick={() => applyFormat("underline")}><FaUnderline /></button>
-        <button className="toolbar-btn" onClick={() => applyFormat("strikethrough")}><FaStrikethrough /></button>
-        <button className="toolbar-btn" onClick={() => setBlock("h1")}><FaHeading /><span className="text-xs">1</span></button>
-        <button className="toolbar-btn" onClick={() => setBlock("h2")}><FaHeading /><span className="text-xs">2</span></button>
-        <button className="toolbar-btn" onClick={() => insertList("ul")}><FaListUl /></button>
-        <button className="toolbar-btn" onClick={() => insertList("ol")}><FaListOl /></button>
-        <button className="toolbar-btn" onClick={undo}><FaUndo /></button>
-        <button className="toolbar-btn" onClick={redo}><FaRedo /></button>
-        <button className="toolbar-btn" onClick={exportDocument}><FaDownload /></button>
+        {/* 其他文本编辑功能 */}
+        <div className="flex space-x-2">
+          <button className="toolbar-btn" onClick={() => applyFormat("bold")}><FaBold /></button>
+          <button className="toolbar-btn" onClick={() => applyFormat("italic")}><FaItalic /></button>
+          <button className="toolbar-btn" onClick={() => applyFormat("underline")}><FaUnderline /></button>
+          <button className="toolbar-btn" onClick={() => applyFormat("strikethrough")}><FaStrikethrough /></button>
+          <button className="toolbar-btn" onClick={() => setBlock("h1")}><FaHeading /><span className="text-xs">1</span></button>
+          <button className="toolbar-btn" onClick={() => setBlock("h2")}><FaHeading /><span className="text-xs">2</span></button>
+          <button className="toolbar-btn" onClick={() => insertList("ul")}><FaListUl /></button>
+          <button className="toolbar-btn" onClick={() => insertList("ol")}><FaListOl /></button>
+          <button className="toolbar-btn" onClick={undo}><FaUndo /></button>
+          <button className="toolbar-btn" onClick={redo}><FaRedo /></button>
+          <button className="toolbar-btn" onClick={exportDocument}><FaDownload /></button>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,11 @@ import { useAuth } from "./context/AuthProvider"
 import TextEditor from "./components/TextEditor";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
+import Langding from "./components/Landing";
 import { useState } from "react";
+import Login from "./components/Login";
+import ForgotPassword from "./components/ForgotPassword";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 
 function App() {
@@ -20,7 +24,6 @@ function App() {
     customerPrompt: ""
   });
 
-  // 更新状态的函数
   const updateUserOption = (key, value) => {
     setUserOptions((prev) => ({
       ...prev,
@@ -29,24 +32,39 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <Navbar />
+    <BrowserRouter>
+      <div className="flex flex-col h-screen"> 
+        <Navbar />
 
-      <div className="flex flex-1">
-        <Sidebar 
-          userOptions={userOptions}
-          updateUserOption={updateUserOption}
-          toggleCustomize={toggleCustomize}
-          isCustomizeOpen={isCustomizeOpen}
-        /> 
+        <Routes>
+          {/* landing page */}
+          <Route path="/" element={<Langding />} />
 
-        <div className="flex-1 p-6">
-          {user 
-            ? <TextEditor userOptions={userOptions} toggleCustomize={toggleCustomize}/> 
-            : <p className="text-center text-lg">Please login to continue.</p>}
-        </div>
+          {/* login pages */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          {/* editor page */}
+          <Route path="/editor" element={
+            user ? (
+              <div className="flex flex-1">
+                <Sidebar 
+                  userOptions={userOptions}
+                  updateUserOption={updateUserOption}
+                  toggleCustomize={toggleCustomize}
+                  isCustomizeOpen={isCustomizeOpen}
+                /> 
+                <div className="flex-1 px-6">
+                  <TextEditor userOptions={userOptions} toggleCustomize={toggleCustomize}/>
+                </div>
+              </div>
+            ) : (
+              <Navigate to="/login" />
+            )}
+          />
+        </Routes>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 

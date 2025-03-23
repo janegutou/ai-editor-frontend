@@ -51,9 +51,19 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   const [editor] = useLexicalComposerContext();
   const [editorContent, setEditorContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [saveError, setSaveError] = useState(null);
   const LOCAL_STORAGE_KEY = "editorContent"; // temporary storage key
 
+  const [messageStatus, setMessageStatus] = useState({ type: "info", text: "\u00A0" });  // 初始化有一个空白占位
+
+  const showMessage = (type, text, duration = 5000) => {
+    setMessageStatus({ type, text });
+    console.log(messageStatus)
+
+    if (duration) {
+      setTimeout(() => setMessageStatus({ type: "info", text: "\u00A0" }), duration);
+    }
+  };
+    
   const onChange = useCallback(debounce((editorState) => { // will handle shorttime storage via local storage
     editorState.read(() => {
       const content = JSON.stringify(editorState) // convert editor state type (ob) to string for local storage
@@ -80,10 +90,9 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       savedContent = data.content;
       console.log("✅ 服务器加载文档成功！");
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
-      setSaveError(null);
     } catch (error) {
       console.error("❌ 服务器加载文档失败", error);
-      setSaveError("Could not load document from server. Please try again later.");
+      showMessage("error", "Could not load document from server. Please try again later.");
       //savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 不再尝试加载本地缓存
     }
   
@@ -120,11 +129,10 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       
       if (response.ok) {
         console.log("✅ 保存服务器成功！");
-        setSaveError(null);
       }
     } catch (error) {
       console.error("❌ 保存服务器失败:", error);
-      setSaveError("Could not save document to server. Please check network connection.");
+      showMessage("error", "Could not save document to server. Please check network connection.");
     }
   };
 
@@ -161,11 +169,22 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     };
   }, [editor, isLoaded]);
 
+  const messageTypeToColor = { // define the message type mapping to colors
+    loading: "text-blue-700",
+    success: "text-green-700",
+    error: "text-red-700",
+    warning: "text-yellow-700",
+    info: "text-gray-700",
+  };
 
-  return (
-    <div className="w-full max-w-5xl mx-auto bg-white p-6">
-      {saveError && <div className="alert alert-error">{saveError}</div>}  {/** error message */}
-      <Toolbar userOptions={userOptions} toggleCustomize={toggleCustomize}/>
+  return (    
+    <div className="w-full max-w-5xl mx-auto bg-white p-2">      
+      {/* 状态显示区 */}
+      <div className={`flex items-center p-1 font-semibold transition-all text-sm ${messageTypeToColor[messageStatus.type]}`}>
+        {messageStatus.text}
+      </div>
+      
+      <Toolbar userOptions={userOptions} toggleCustomize={toggleCustomize} showMessage={showMessage}/>
       <ListPlugin /> 
       <div className="relative">
         <RichTextPlugin
