@@ -186,6 +186,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
       
       // 3. 插入生成的文本
       if (data.generated_text) {
+        console.log("Generated text:", data.generated_text);
         editor.update(() => {
           const selection = $getSelection();
 
