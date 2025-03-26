@@ -15,7 +15,7 @@ const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOp
 
   return (
     <div
-      className={`bg-gray-200 h-screen p-4 ${sidebarOpen ? "w-80" : "w-16"} transition-all duration-300`}
+      className={`bg-gray-200 p-4 ${sidebarOpen ? "w-80" : "w-16"} transition-all duration-300`}
     >
       {/* 折叠/展开按钮 */}
       <button className="text-gray-700 mb-4" onClick={toggleSidebar}>

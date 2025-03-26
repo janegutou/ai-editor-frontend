@@ -31,6 +31,7 @@ const Navbar = () => {
       <div className="relative">
         {user ? (
           <div className="flex items-center justify-between space-x-3">
+
             {/* 用户头像（首字母） */}
             <div className="flex items-center">
               <button
@@ -43,7 +44,14 @@ const Navbar = () => {
 
             {/* toggle 菜单 */}
             {menuOpen && (
-              <div className="absolute z-50 right-0 top-full mt-1 w-48 bg-white text-gray-800 border border-gray-200 shadow-lg rounded-lg">
+              <div className="absolute z-50 right-0 top-full mt-2 p-2 w-56 bg-white text-gray-800 border border-gray-200 shadow-lg rounded-lg">
+                
+                { /* if too long email, add ellipsis */}
+                <div className="px-4 py-2 text-sm text-gray-700 truncate">
+                  {user.email} 
+                </div>
+                
+                
                 <div className="px-4 py-2 text-sm text-gray-700">
                   {tokens && <p>Tokens: {tokens}</p>} 
                 </div>
@@ -52,7 +60,7 @@ const Navbar = () => {
                   className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-200"
                 >
                   <FaSignOutAlt className="mr-2" />
-                  Logout
+                  Log Out
                 </button>
               </div>
             )}

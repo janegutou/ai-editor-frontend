@@ -203,7 +203,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
             }
             const newParagraph = $createParagraphNode();
             const newTextNode = $createTextNode(data.generated_text);
-            newParagraph.append(newTextNode);
+            newParagraph.append(newTextNode); // TODO: 
 
             node.insertAfter(newParagraph);
           }
