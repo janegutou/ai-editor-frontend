@@ -11,10 +11,18 @@
   position: relative;
 }
 
+
+li::marker {
+  color: var(--listitem-marker-color, inherit);
+  background-color: var(--listitem-marker-bg, inherit);
+  font-size: var(--listitem-marker-size);
+}
+
 .editor-list-ol {
   list-style-type: decimal;
   padding-left: 20px;
 }
+
 
 .editor-list-ul {
   list-style-type: disc;

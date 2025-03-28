@@ -57,7 +57,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
   const showMessage = (type, text, duration = 5000) => {
     setMessageStatus({ type, text });
-    console.log(messageStatus)
+    //console.log(messageStatus)
 
     if (duration) {
       setTimeout(() => setMessageStatus({ type: "info", text: "\u00A0" }), duration);

@@ -10,16 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lexical/html": "^0.25.0",
     "@lexical/list": "^0.25.0",
     "@lexical/markdown": "^0.25.0",
     "@lexical/react": "^0.25.0",
     "@lexical/rich-text": "^0.25.0",
     "@lexical/selection": "^0.25.0",
+    "@lexical/utils": "^0.25.0",
     "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/vite": "^4.0.8",
     "lexical": "^0.25.0",
     "lodash": "^4.17.21",
+    "marked": "^15.0.7",
     "react": "^19.0.0",
+    "react-color": "^2.19.3",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.4.0"
