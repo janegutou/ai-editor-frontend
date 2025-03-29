@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .toolbar-btn {
-    @apply flex px-2 py-1 text-gray-700 bg-transparent rounded-lg text-sm items-center justify-center hover:bg-gray-200 active:bg-gray-300 transition;
+    @apply flex px-2 py-1 text-gray-600 bg-transparent rounded-lg text-sm items-center justify-center hover:bg-gray-200 active:bg-gray-300 transition;
   }
 
 .editor-paragraph {

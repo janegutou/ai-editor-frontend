@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FaList, FaTimes, FaBars } from "react-icons/fa";
 
 const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOpen}) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,11 +16,15 @@ const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOp
 
   return (
     <div
-      className={`bg-gray-200 p-4 ${sidebarOpen ? "w-80" : "w-16"} transition-all duration-300`}
+      className={`bg-sidebar p-4 ${sidebarOpen ? "w-80" : "w-16"} transition-all duration-300`}
     >
       {/* 折叠/展开按钮 */}
-      <button className="text-gray-700 mb-4" onClick={toggleSidebar}>
-        {sidebarOpen ? "←" : "→"}
+      <button className="text-gray-500 mb-4" onClick={toggleSidebar}>
+        {sidebarOpen ? (
+          <FaTimes className="w-5 h-5" />
+        ) : (
+          <FaBars className="w-5 h-5" />
+        )}
       </button>
 
       {/* 侧边栏内容*/}
@@ -29,7 +34,7 @@ const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOp
           {/* AI Model Selection */}
           <h2 className="text-gray-700 mb-4">AI Model Selection</h2>
           <select
-            className="p-2 mr-2 mb-2 bg-gray-700 text-white rounded"
+            className="p-2 mr-2 mb-2 bg-secondary text-white rounded"
             value={userOptions.selectedModel}
             onChange={(e) => updateUserOption("selectedModel", e.target.value)}
           >

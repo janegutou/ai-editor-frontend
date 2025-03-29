@@ -10,7 +10,7 @@ const LandingPage = () => {
   return (
     <div className="bg-white text-gray-900 font-sans">
       {/* Hero Section */}
-      <section className="bg-blue-500 text-white py-12 px-4 text-center">
+      <section className="bg-secondary text-white py-12 px-4 text-center">
         <h1 className="text-4xl font-bold mb-4">
           Boost Your Writing Efficiency with AI
         </h1>
@@ -19,7 +19,7 @@ const LandingPage = () => {
           suggestions. Perfect for writers, content creators, and professionals!
         </p>
         <button 
-          className="bg-yellow-500 text-black px-6 py-3 rounded-full text-xl hover:bg-yellow-400"
+          className="bg-gray-100 text-black px-6 py-3 rounded-full text-xl hover:bg-gray-200"
           onClick={() => navigate('/editor')}
         > 
           Try It Now
@@ -86,10 +86,10 @@ const LandingPage = () => {
       </section>
 
       {/* Final CTA Section */}
-      <section className="bg-blue-500 text-white py-12 px-4 text-center">
+      <section className="bg-secondary text-white py-12 px-4 text-center">
         <h2 className="text-3xl font-semibold mb-6">Ready to Boost Your Writing?</h2>
         <button 
-          className="bg-yellow-500 text-black px-6 py-3 rounded-full text-xl hover:bg-yellow-400"
+          className="bg-gray-100 text-black px-6 py-3 rounded-full text-xl hover:bg-gray-200"
           onClick={() => navigate('/editor')}
         > 
           Start Now

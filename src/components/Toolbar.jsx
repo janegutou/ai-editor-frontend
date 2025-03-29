@@ -3,7 +3,7 @@ import { $setBlocksType, $patchStyleText } from '@lexical/selection';
 import { $getSelection, $isRangeSelection, UNDO_COMMAND,  REDO_COMMAND, $createParagraphNode, $createTextNode, $isTextNode, $isParagraphNode, getNearestEditorFromDOMNode, $getNearestNodeFromDOMNode, $getNodeByKey } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND } from "@lexical/list";
 import { $getNearestBlockElementAncestorOrThrow} from '@lexical/utils';
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { $createHeadingNode, $isQuoteNode, $isHeadingNode } from '@lexical/rich-text';
 import { $generateNodesFromDOM } from '@lexical/html';
 import {$isDecoratorBlockNode} from '@lexical/react/LexicalDecoratorBlockNode';
@@ -21,8 +21,26 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   const [ftColor, setFtColor] = useState("red");
   const [showBgColorPicker, setShowBgColorPicker] = useState(false);
   const [showFtColorPicker, setShowFtColorPicker] = useState(false);
+  const [bgPickerVisible, setBgPickerVisible] = useState(false);
+  const [ftPickerVisible, setFtPickerVisible] = useState(false);
   const [bgColorPickerPosition, setBgColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制背景颜色选择器的位置
   const [ftColorPickerPosition, setFtColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制字体颜色选择器的位置
+
+  useEffect(() => {
+    if (showBgColorPicker) {
+      setTimeout(() => setBgPickerVisible(true), 50);
+    } else {
+      setBgPickerVisible(false);
+    }
+  }, [showBgColorPicker]);
+  
+  useEffect(() => {
+    if (showFtColorPicker) {
+      setTimeout(() => setFtPickerVisible(true), 50);
+    } else {
+      setFtPickerVisible(false);
+    }
+  }, [showFtColorPicker]);
 
   const handleBgColorChange = (color) => {
     setBgColor(color.hex);
@@ -425,13 +443,17 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
 
   return (
     <div>
-      <div className="flex border-b border-gray-300 p-2 bg-gray-100 h-16 overflow-x-auto sticky no-scrollbar">
+      <div className="flex border-b border-gray-300 p-2 bg-white h-14 shadow-md flex-wrap flex-wrap-reverse">
         {/* AI 交互部分 */}
         <div className="flex space-x-3">
-          <button className="toolbar-btn" title="Polish the text" onClick={() => generateAIContent("polish")}><FaMagic /></button>
-          <button className="toolbar-btn" title="Expand the text" onClick={() => generateAIContent("expand")}><FaFileAlt /></button>
-          <button className="toolbar-btn" title="Continue writing" onClick={() => generateAIContent("continue")}><FaLightbulb /></button>
-          <button className="toolbar-btn" title="Custom prompt" onClick={() => toggleCustomize(true)}><FaCog /></button>
+          <button className="toolbar-btn" title="Polish the text" onClick={() => generateAIContent("polish")}>
+            <FaMagic className="text-secondary w-4 h-4"/></button>
+          <button className="toolbar-btn" title="Expand the text" onClick={() => generateAIContent("expand")}>
+            <FaFileAlt className="text-secondary w-4 h-4"/></button>
+          <button className="toolbar-btn" title="Continue writing" onClick={() => generateAIContent("continue")}>
+            <FaLightbulb className="text-secondary w-4 h-4"/></button>
+          <button className="toolbar-btn" title="Custom prompt" onClick={() => toggleCustomize(true)}>
+            <FaCog /></button>
         </div>
 
         <div className="w-px bg-gray-300 mx-4"></div>
@@ -442,8 +464,10 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
           <button className="toolbar-btn" onClick={() => applyFormat("italic")}><FaItalic /></button>
           <button className="toolbar-btn" onClick={() => applyFormat("underline")}><FaUnderline /></button>
           <button className="toolbar-btn" onClick={() => applyFormat("strikethrough")}><FaStrikethrough /></button>
-          <button className="toolbar-btn" onClick={() => setBlock("h1")}><FaHeading /><span className="text-xs">1</span></button>
-          <button className="toolbar-btn" onClick={() => setBlock("h2")}><FaHeading /><span className="text-xs">2</span></button>
+          <button className="toolbar-btn" onClick={() => setBlock("h1")}>
+            <FaHeading /><span className="text-xs">1</span></button>
+          <button className="toolbar-btn" onClick={() => setBlock("h2")}>
+            <FaHeading /><span className="text-xs">2</span></button>
           <button className="toolbar-btn" onClick={() => insertList("ul")}><FaListUl /></button>
           <button className="toolbar-btn" onClick={() => insertList("ol")}><FaListOl /></button>
           
@@ -451,14 +475,14 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
           <div className="flex flex-col items-center justify-center group">
             <div className="flex">
               <button 
-                className="flex items-center justify-center text-gray-700 bg-transparent rounded-l-lg 
-                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pl-2 pr-1" 
+                className="flex items-center justify-center text-gray-600 bg-transparent rounded-l-lg 
+                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pt-1 pb-1 pl-2 pr-1" 
                 onClick={() => applyStyleText("color")}><FaFont />
               </button>
               <div className="w-px bg-gray-100" />
               <button 
-                className="flex items-center justify-center text-gray-700 bg-transparent rounded-r-lg 
-                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pl-1 pr-2" 
+                className="flex items-center justify-center text-gray-600 bg-transparent rounded-r-lg 
+                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pt-1 pb-1 pl-1 pr-2" 
                 onClick={toggleFtColorPicker}><FaChevronDown className="w-2 h-2"/>
               </button>
             </div>
@@ -468,14 +492,14 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
           <div className="flex flex-col items-center justify-center group">
             <div className="flex">
               <button 
-                className="flex items-center justify-center text-gray-700 bg-transparent rounded-l-lg 
-                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pl-2 pr-1" 
+                className="flex items-center justify-center text-gray-600 bg-transparent rounded-l-lg 
+                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pt-1 pb-1 pl-2 pr-1" 
                 onClick={() => applyStyleText("background-color")}><FaHighlighter />
               </button>
               <div className="w-px bg-gray-100" />
               <button 
-                className="flex items-center justify-center text-gray-700 bg-transparent rounded-r-lg 
-                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pl-1 pr-2" 
+                className="flex items-center justify-center text-gray-600 bg-transparent rounded-r-lg 
+                  hover:bg-gray-200 active:bg-gray-300 group-hover:bg-gray-200 transition pt-1 pb-1 pl-1 pr-2" 
                 onClick={toggleBgColorPicker}><FaChevronDown className="w-2 h-2"/>
               </button>
             </div>
@@ -489,7 +513,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
       </div> 
       
       {/* 下拉颜色选择器  flex px-2 py-1 text-sm */}
-      {showBgColorPicker && (
+      {bgPickerVisible  && (
         <div className="absolute z-10 mt-2"
         style={{ top: bgColorPickerPosition.top + "px", left: bgColorPickerPosition.left + "px" }}
         >
@@ -497,7 +521,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         </div>
       )}
 
-      {showFtColorPicker && (
+      {ftPickerVisible && (
         <div className="absolute z-10 mt-2"
         style={{ top: ftColorPickerPosition.top + "px", left: ftColorPickerPosition.left + "px" }}
         >

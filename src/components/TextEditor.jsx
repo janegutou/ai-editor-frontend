@@ -178,18 +178,19 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   };
 
   return (    
-    <div className="w-full max-w-5xl mx-auto bg-white p-2 h-[calc(100vh-6rem)] flex flex-col">      
-      {/* 状态显示区 */}
-      <div className={`flex items-center p-1 font-semibold transition-all text-sm ${messageTypeToColor[messageStatus.type]}`}>
-        {messageStatus.text}
-      </div>
-      
+    <div className="max-w-5xl mx-auto bg-white p-2 pt-8 h-[calc(100vh-6rem)] flex flex-col">      
       <Toolbar userOptions={userOptions} toggleCustomize={toggleCustomize} showMessage={showMessage}/>
       <ListPlugin /> 
+      
+      {/* 状态显示区 */}
+      <div className={`flex items-center justify-center w-full p-1 font-semibold transition-all text-sm ${messageTypeToColor[messageStatus.type]}`}>
+        {messageStatus.text}
+      </div>
+
       <div className="relative flex-grow overflow-y-auto">
         <RichTextPlugin
           contentEditable={
-            <ContentEditable className="w-full min-h-[200px] outline-none text-gray-900 text-lg leading-6 pt-6 p-2" />
+            <ContentEditable className="w-full min-h-[200px] outline-none text-gray-800 text-lg leading-6 pt-6 p-4" />
           }
           placeholder={<div className="absolute top-6 left-2 text-gray-400">Start writing...</div>}
         />
