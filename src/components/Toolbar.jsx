@@ -10,8 +10,6 @@ import {$isDecoratorBlockNode} from '@lexical/react/LexicalDecoratorBlockNode';
 import { FaBold, FaItalic, FaUnderline, FaStrikethrough, FaHeading, FaListUl, FaListOl, FaUndo, FaRedo, FaDownload, FaExpand, FaPlay } from "react-icons/fa";
 import { FaMagic, FaFileAlt, FaChevronDown, FaEraser, FaPalette, FaFont, FaPlusCircle, FaAngleDoubleRight, FaRegLightbulb, FaLightbulb, FaRocket, FaCog, FaHighlighter } from "react-icons/fa";
 import { marked } from "marked";
-import { SketchPicker } from "react-color";
-
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -23,6 +21,14 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   const [showFtColorPicker, setShowFtColorPicker] = useState(false);
   const [bgColorPickerPosition, setBgColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制背景颜色选择器的位置
   const [ftColorPickerPosition, setFtColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制字体颜色选择器的位置
+  const [SketchPicker, setSketchPicker] = useState(null); // state for dynamically loaded SketchPicker component
+
+  // Dynamically load SketchPicker component
+  useEffect(() => {
+    import('react-color').then((module) => {
+      setSketchPicker(() => module.SketchPicker);
+    });
+  }, []);
 
 
   const handleBgColorChange = (color) => {
@@ -495,24 +501,24 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
           <button className="toolbar-btn" onClick={exportDocument}><FaDownload /></button>
         </div>
       </div> 
-      <div>
-        {typeof window !== "undefined" && (
-        <SketchPicker/>)}
-      </div>
       {/* 下拉颜色选择器  flex px-2 py-1 text-sm */}
       {showBgColorPicker && (
         <div className="absolute z-10 mt-2"
-        style={{ top: bgColorPickerPosition.top + "px", left: bgColorPickerPosition.left + "px" }}
+          style={{ top: bgColorPickerPosition.top + "px", left: bgColorPickerPosition.left + "px" }}
         >
-          <SketchPicker color={bgColor} onChangeComplete={handleBgColorChange} />
+          {SketchPicker && (
+            <SketchPicker color={bgColor} onChangeComplete={handleBgColorChange} />
+          )}
         </div>
       )}
 
       {showFtColorPicker && (
         <div className="absolute z-10 mt-2"
-        style={{ top: ftColorPickerPosition.top + "px", left: ftColorPickerPosition.left + "px" }}
+          style={{ top: ftColorPickerPosition.top + "px", left: ftColorPickerPosition.left + "px" }}
         >
-          <SketchPicker color={ftColor} onChangeComplete={handleFtColorChange} />
+          {SketchPicker && (
+            <SketchPicker color={ftColor} onChangeComplete={handleFtColorChange} />
+          )}
         </div>
       )}
     </div>
