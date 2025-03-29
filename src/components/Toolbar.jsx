@@ -10,7 +10,7 @@ import {$isDecoratorBlockNode} from '@lexical/react/LexicalDecoratorBlockNode';
 import { FaBold, FaItalic, FaUnderline, FaStrikethrough, FaHeading, FaListUl, FaListOl, FaUndo, FaRedo, FaDownload, FaExpand, FaPlay } from "react-icons/fa";
 import { FaMagic, FaFileAlt, FaChevronDown, FaEraser, FaPalette, FaFont, FaPlusCircle, FaAngleDoubleRight, FaRegLightbulb, FaLightbulb, FaRocket, FaCog, FaHighlighter } from "react-icons/fa";
 import { marked } from "marked";
-import { TwitterPicker } from "react-color";
+import { TwitterPicker, GithubPicker, CompactPicker } from "react-color";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -22,6 +22,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   const [showFtColorPicker, setShowFtColorPicker] = useState(false);
   const [bgColorPickerPosition, setBgColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制背景颜色选择器的位置
   const [ftColorPickerPosition, setFtColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制字体颜色选择器的位置
+  const ColorPicker = CompactPicker; // 选择器组件
 
   const handleBgColorChange = (color) => {
     console.log("color:", color)
@@ -498,7 +499,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         <div className="absolute z-10 mt-2"
           style={{ top: bgColorPickerPosition.top + "px", left: bgColorPickerPosition.left + "px" }}
         >
-          <TwitterPicker color={bgColor} onChangeComplete={handleBgColorChange} />
+          <ColorPicker color={bgColor} onChangeComplete={handleBgColorChange} />
         </div>
       )}
 
@@ -506,7 +507,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         <div className="absolute z-10 mt-2"
           style={{ top: ftColorPickerPosition.top + "px", left: ftColorPickerPosition.left + "px" }}
         >
-          <TwitterPicker color={ftColor} onChangeComplete={handleFtColorChange} />
+          <ColorPicker color={ftColor} onChangeComplete={handleFtColorChange} />
         </div>
       )}
     </div>
