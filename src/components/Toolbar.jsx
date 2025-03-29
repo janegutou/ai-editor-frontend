@@ -496,7 +496,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         </div>
       </div> 
       <div>
-        <SketchPicker color={bgColor} onChangeComplete={handleBgColorChange} />
+        <SketchPicker/>
       </div>
       {/* 下拉颜色选择器  flex px-2 py-1 text-sm */}
       {showBgColorPicker && (
