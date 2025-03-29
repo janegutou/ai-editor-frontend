@@ -181,8 +181,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       <ListPlugin /> 
       
       {/* 状态显示区 */}
-      <div className={`flex items-center justify-center w-full p-2 font-semibold transition-all text-sm
-        ${messageTypeToColor[messageStatus.type]}`}>
+      <div className={`flex items-center justify-center w-full p-2 font-semibold transition-all text-sm ${messageTypeToColor[messageStatus.type]}`}>
         {messageStatus.text}
       </div>
 
@@ -191,7 +190,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
           contentEditable={
             <ContentEditable className="w-full min-h-[200px] outline-none text-gray-800 text-lg leading-6 p-4" />
           }
-          placeholder={<div className="absolute p-4 text-gray-400">Start writing...</div>}
+          placeholder={<div className="absolute top-6 left-4 text-gray-400">Start writing...</div>}
         />
       </div>
       <OnChangePlugin onChange={onChange} />

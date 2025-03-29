@@ -495,11 +495,13 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
           <button className="toolbar-btn" onClick={exportDocument}><FaDownload /></button>
         </div>
       </div> 
-      
+      <div>
+        <SketchPicker color={bgColor} onChangeComplete={handleBgColorChange} />
+      </div>
       {/* 下拉颜色选择器  flex px-2 py-1 text-sm */}
       {showBgColorPicker && (
         <div className="absolute z-10 mt-2"
-        style={{ top: "2px", left: "2px" }}
+        style={{ top: bgColorPickerPosition.top + "px", left: bgColorPickerPosition.left + "px" }}
         >
           <SketchPicker color={bgColor} onChangeComplete={handleBgColorChange} />
         </div>
