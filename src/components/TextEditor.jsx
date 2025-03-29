@@ -55,6 +55,14 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
   const [messageStatus, setMessageStatus] = useState({ type: "info", text: "\u00A0" });  // 初始化有一个空白占位
 
+  const messageTypeToColor = { // define the message type mapping to colors
+    loading: "text-blue-700",
+    success: "text-green-700",
+    error: "text-red-700",
+    warning: "text-yellow-700",
+    info: "text-gray-700",
+  };
+
   const showMessage = (type, text, duration = 5000) => {
     setMessageStatus({ type, text });
     //console.log(messageStatus)
@@ -75,7 +83,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   
   const loadDocument = async () => {
     let savedContent = null;
-    console.log("try to load document...")
+    showMessage("loading", "Loading document...");
     const token = localStorage.getItem("supabaseToken");
   
     try {
@@ -88,10 +96,9 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       });
       const data = await response.json();
       savedContent = data.content;
-      console.log("✅ 服务器加载文档成功！");
+      showMessage("success", "Document loaded.");
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
     } catch (error) {
-      console.error("❌ 服务器加载文档失败", error);
       showMessage("error", "Could not load document from server. Please try again later.");
       //savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 不再尝试加载本地缓存
     }
@@ -107,7 +114,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
         $getRoot().append(...nodes); */
       });
     } else {
-      console.log("没有内容")
+      console.log("no content")
     }
   };
 
@@ -128,10 +135,9 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       });
       
       if (response.ok) {
-        console.log("✅ 保存服务器成功！");
+        console.log("Document saved to server.");
       }
     } catch (error) {
-      console.error("❌ 保存服务器失败:", error);
       showMessage("error", "Could not save document to server. Please check network connection.");
     }
   };
@@ -169,14 +175,6 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     };
   }, [editor, isLoaded]);
 
-  const messageTypeToColor = { // define the message type mapping to colors
-    loading: "text-blue-700",
-    success: "text-green-700",
-    error: "text-red-700",
-    warning: "text-yellow-700",
-    info: "text-gray-700",
-  };
-
   return (    
     <div className="max-w-5xl mx-auto bg-white p-2 pt-8 h-[calc(100vh-6rem)] flex flex-col">      
       <Toolbar userOptions={userOptions} toggleCustomize={toggleCustomize} showMessage={showMessage}/>
@@ -192,7 +190,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
           contentEditable={
             <ContentEditable className="w-full min-h-[200px] outline-none text-gray-800 text-lg leading-6 pt-6 p-4" />
           }
-          placeholder={<div className="absolute top-6 left-2 text-gray-400">Start writing...</div>}
+          placeholder={<div className="absolute top-6 left-4 text-gray-400">Start writing...</div>}
         />
       </div>
       <OnChangePlugin onChange={onChange} />

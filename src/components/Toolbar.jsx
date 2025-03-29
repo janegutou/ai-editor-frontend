@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $setBlocksType, $patchStyleText } from '@lexical/selection';
-import { $getSelection, $isRangeSelection, UNDO_COMMAND,  REDO_COMMAND, $createParagraphNode, $createTextNode, $isTextNode, $isParagraphNode, getNearestEditorFromDOMNode, $getNearestNodeFromDOMNode, $getNodeByKey } from "lexical";
+import { $getSelection, $isRangeSelection, UNDO_COMMAND,  REDO_COMMAND, $createParagraphNode, $createTextNode, $isTextNode, $isParagraphNode, $getNearestNodeFromDOMNode, $getNodeByKey } from "lexical";
 import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND } from "@lexical/list";
 import { $getNearestBlockElementAncestorOrThrow} from '@lexical/utils';
 import { useCallback, useState, useEffect } from "react";
@@ -17,32 +17,16 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   const [editor] = useLexicalComposerContext();
-  const [bgColor, setBgColor] = useState("yellow");
-  const [ftColor, setFtColor] = useState("red");
+  const [bgColor, setBgColor] = useState("#F8E71C"); // init yellow
+  const [ftColor, setFtColor] = useState("#D0021B"); // init red
   const [showBgColorPicker, setShowBgColorPicker] = useState(false);
   const [showFtColorPicker, setShowFtColorPicker] = useState(false);
-  const [bgPickerVisible, setBgPickerVisible] = useState(false);
-  const [ftPickerVisible, setFtPickerVisible] = useState(false);
   const [bgColorPickerPosition, setBgColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制背景颜色选择器的位置
   const [ftColorPickerPosition, setFtColorPickerPosition] = useState({ top: 0, left: 0 }); // 控制字体颜色选择器的位置
 
-  useEffect(() => {
-    if (showBgColorPicker) {
-      setTimeout(() => setBgPickerVisible(true), 50);
-    } else {
-      setBgPickerVisible(false);
-    }
-  }, [showBgColorPicker]);
-  
-  useEffect(() => {
-    if (showFtColorPicker) {
-      setTimeout(() => setFtPickerVisible(true), 50);
-    } else {
-      setFtPickerVisible(false);
-    }
-  }, [showFtColorPicker]);
 
   const handleBgColorChange = (color) => {
+    console.log("color:", color)
     setBgColor(color.hex);
   };
 
@@ -513,7 +497,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
       </div> 
       
       {/* 下拉颜色选择器  flex px-2 py-1 text-sm */}
-      {bgPickerVisible  && (
+      {showBgColorPicker  && (
         <div className="absolute z-10 mt-2"
         style={{ top: bgColorPickerPosition.top + "px", left: bgColorPickerPosition.left + "px" }}
         >
@@ -521,7 +505,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         </div>
       )}
 
-      {ftPickerVisible && (
+      {showFtColorPicker && (
         <div className="absolute z-10 mt-2"
         style={{ top: ftColorPickerPosition.top + "px", left: ftColorPickerPosition.left + "px" }}
         >
