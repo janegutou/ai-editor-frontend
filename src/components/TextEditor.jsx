@@ -190,7 +190,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
           contentEditable={
             <ContentEditable className="w-full min-h-[200px] outline-none text-gray-800 text-lg leading-6 p-4" />
           }
-          placeholder={<div className="absolute top-6 left-4 text-gray-400">Start writing...</div>}
+          placeholder={<div className="absolute top-4 left-4 text-gray-400">Start writing...</div>}
         />
       </div>
       <OnChangePlugin onChange={onChange} />
