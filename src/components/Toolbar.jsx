@@ -300,7 +300,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
 
 
   const generateAIContent = async (selectedMode) => {
-    showMessage("loading", "AI is generating...");
+    showMessage("loading", "AI is generating...", 0);
 
     // 1. 获取文本
     const contextText = getEditorText();

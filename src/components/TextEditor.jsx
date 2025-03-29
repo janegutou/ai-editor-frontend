@@ -83,7 +83,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   
   const loadDocument = async () => {
     let savedContent = null;
-    showMessage("loading", "Loading document...");
+    showMessage("loading", "Loading document...", 0);
     const token = localStorage.getItem("supabaseToken");
   
     try {
