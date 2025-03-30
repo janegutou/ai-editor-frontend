@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin'
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
@@ -140,43 +140,59 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     }
   };
 
+  const handleSave = useCallback(() => { // useCallback to prevent 闭包问题
+    if (isLoaded) {
+      console.log("save document triggered by useEffect");
+      saveDocument();
+    }
+  }, [isLoaded]);
+
+  const loadAndSetFlag = async () => {
+    try {
+      await loadDocument();  // if here throw any error, won't execute the following code
+      setIsLoaded(true);
+    } catch (error) {
+      console.error("Document is not loaded, isloaded flag is false:", error);
+      setIsLoaded(false);
+    }
+  };
+  
+  const debouncedLoad = useRef(debounce(loadAndSetFlag, 5000)).current // debounce to prevent too many loading requests; use ref to keep the latest function in memory
+
+
   useEffect(() => { // define when to load and save document
 
-    // load document - do it whenever editor mounts
-    const loadAndSetFlag = async () => {
-      try {
-        await loadDocument();  // if here throw any error, won't execute the following code
-        setIsLoaded(true);
-      } catch (error) {
-        console.error("Document is not loaded, isloaded flag is false:", error);
-      }
-    };
-    loadAndSetFlag();
-
-    // save document - do it when events trigger (visibilitychange, beforeunload, every 5 minutes, unmount)
-    const handleSave = () => {
-      if (isLoaded) { // only save when editor is loaded
-        console.log("save document triggered by useEffect");
-        saveDocument();
-      }
+    const handleOffline = () => {
+      setIsLoaded(false);
+      showMessage("warning", "Network connection lost.");
     };
 
+    debouncedLoad(); // first load
+
+    // network listerers
+    window.addEventListener("online", debouncedLoad); // if network is back, reload document
+    window.addEventListener("offline", handleOffline); // if network offline, set isloaded flag to false:
+
+    // event listeners
     window.addEventListener("beforeunload", handleSave); // save document on window close event
-    window.addEventListener("visibilitychange", handleSave); // save document on tab change
+    window.addEventListener("visibilitychange", () => { // save document on tab change (add criteria to avoid frequent save)
+      if (document.visibilityState === "hidden") handleSave();
+    }); 
     const autoSaveInterval = setInterval(() => { // save every 5 minutes
       handleSave();
     }, 5 * 60 * 1000); 
     
     return () => {
-      if (isLoaded) {
-        handleSave(); // save document on unmount
-      };
+      if (isLoaded) handleSave(); // save document on unmount
       // clear
+      window.removeEventListener("online", debouncedLoad);
+      window.removeEventListener("offline", handleOffline);
       window.removeEventListener("beforeunload", handleSave);
       window.removeEventListener("visibilitychange", handleSave);
       clearInterval(autoSaveInterval);
+      debouncedLoad.cancel(); // must cancel debounced function to prevent memory leak
     };
-  }, [editor, isLoaded]);
+  }, [editor, isLoaded, handleSave, debouncedLoad]);
 
   return (    
     <div className="max-w-5xl mx-auto bg-white p-2 pt-8 h-[calc(100vh-6rem)] flex flex-col">      
