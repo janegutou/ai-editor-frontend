@@ -374,8 +374,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
           }
         );
           
-        // second update: apply DOM styles to the new paragraph
-        
+        // second update: apply DOM styles to the new paragraph        
         requestAnimationFrame(() => {
           editor.update(() => {
             const newParagraph = $getNodeByKey(newParagraphKey);
@@ -385,6 +384,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
             }
           });
         });
+        
         localStorage.setItem("remainingTokens", data.tokens);   // update remaining tokens to local storage
       } else {
         console.log("No generated text");

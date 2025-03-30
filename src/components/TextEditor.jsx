@@ -183,7 +183,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     }, 5 * 60 * 1000); 
     
     return () => {
-      if (isLoaded) handleSave(); // save document on unmount
+      handleSave(); // save document on unmount
       // clear
       window.removeEventListener("online", debouncedLoad);
       window.removeEventListener("offline", handleOffline);
