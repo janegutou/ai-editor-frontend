@@ -52,22 +52,31 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
   const [editor] = useLexicalComposerContext();
   const [editorContent, setEditorContent] = useState("");
-  const [messageStatus, setMessageStatus] = useState({ type: "info", text: "\u00A0" });  // 初始化有一个空白占位
+  const [messageStatus, setMessageStatus] = useState({ type: "info", text: "" });  // 初始化有一个空白占位\u00A0
 
   const lastSavedRef = useRef(0); // use ref to keep the latest value in memory
   const isLoadedRef = useRef(false); // use ref to keep the latest value in memory
 
 
   const messageTypeToColor = { // define the message type mapping to colors
-    loading: "text-blue-700",
-    success: "text-green-700",
-    error: "text-red-700",
-    warning: "text-yellow-700",
-    info: "text-gray-700",
+    loading: "text-blue-700 bg-blue-100",
+    success: "text-green-700 bg-green-100",
+    error: "text-red-700 bg-red-100",
+    warning: "text-yellow-700 bg-yellow-100",
+    info: "text-gray-700 bg-gray-100",
   };
 
+  const animationClass = (type) => { // define the animation class for message show up
+    if (type === "loading") {
+      return "animate-pulse";
+    } else {
+      return "animate-fade-in animate-duration-300";
+    }
+  };
+
+
   let timer = null; // use a timer to clear prev message
-  const showMessage = (type, text="\u00A0", duration = 4000) => {
+  const showMessage = (type, text="", duration = 4000) => {
     // clear prev timeout
     clearTimeout(timer);
     
@@ -77,7 +86,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
     if (duration) {
       timer = setTimeout(() => {
-        setMessageStatus({ type: "info", text: "\u00A0" });
+        setMessageStatus({ type: "info", text: "" });
       }, duration);
     }
   };
@@ -110,10 +119,10 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
       const data = await response.json();
       savedContent = data.content;
-      showMessage("success", "Document loaded.");
+      showMessage("success", "Document loaded");
       localStorage.setItem(LOCAL_STORAGE_KEY, savedContent); // 同步本地缓存
     } catch (error) {
-      showMessage("error", "Could not load document from server. Please try again later.");
+      showMessage("error", "Could not load document from server");
       //savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 不再尝试加载本地缓存
       throw error;
     }
@@ -153,10 +162,9 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       }
       throw new Error("Save failed");
     } catch (error) {
-      showMessage("error", "Could not save document to server. Please check network connection.");
+      showMessage("error", "Could not save document to server");
     }
   };
-
 
   const loadAndSetFlag = async () => {
     try {
@@ -187,7 +195,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
     const handleOffline = () => {
       isLoadedRef.current = false;
-      showMessage("warning", "Network connection lost.");
+      showMessage("warning", "Network connection lost");
     };
 
     //console.log("first load");
@@ -235,8 +243,8 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       <ListPlugin /> 
       
       {/* 状态显示区 */}
-      <div className={`flex items-center justify-center w-full p-2 font-semibold transition-all text-sm ${messageTypeToColor[messageStatus.type]}`}>
-        {messageStatus.text}
+      <div className={`flex items-center justify-center w-full p-2 transition-opacity text-semibold text-sm ${animationClass(messageStatus.type)}`}>
+        { messageStatus.text ? <span className={`px-2 ${messageTypeToColor[messageStatus.type]}`}>{messageStatus.text}</span> : <span>{"\u00A0"}</span> }
       </div>
 
       <div className="relative flex-grow overflow-y-auto">

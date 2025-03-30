@@ -389,11 +389,11 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         localStorage.setItem("remainingTokens", data.tokens);   // update remaining tokens to local storage
       } else {
         console.log("No generated text");
-        showMessage("error", "Failed to generate content.")
+        showMessage("error", "Failed to generate content")
       }
     } catch (error) {
       console.error("Error:",error);
-      showMessage("error", "Failed to generate content.");
+      showMessage("error", "Failed to generate content");
     }
   };
 
