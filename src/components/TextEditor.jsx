@@ -52,7 +52,6 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   const [editorContent, setEditorContent] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const LOCAL_STORAGE_KEY = "editorContent"; // temporary storage key
-
   const [messageStatus, setMessageStatus] = useState({ type: "info", text: "\u00A0" });  // 初始化有一个空白占位
 
   const messageTypeToColor = { // define the message type mapping to colors
@@ -66,22 +65,20 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   const showMessage = (type, text, duration = 5000) => {
     setMessageStatus({ type, text });
     //console.log(messageStatus)
-
     if (duration) {
       setTimeout(() => setMessageStatus({ type: "info", text: "\u00A0" }), duration);
     }
   };
     
-  const onChange = useCallback(debounce((editorState) => { // will handle shorttime storage via local storage
+  const onChange = useCallback(debounce((editorState) => { //shorttime storage: save editor state (WIP version) to local storage every 1s
     editorState.read(() => {
       const content = JSON.stringify(editorState) // convert editor state type (ob) to string for local storage
       setEditorContent(content);
-      localStorage.setItem(LOCAL_STORAGE_KEY, content);
-      //console.log("editorContent", content); // Logs text content on change
+      localStorage.setItem(LOCAL_STORAGE_KEY, content); // save to local storage
     });
-  }, 1000), [editor]); // 每1秒存储一次内容到本地缓存
+  }, 1000), [editor]);
   
-  const loadDocument = async () => {
+  const loadDocument = async () => { // load document from DB and set it into editor, also save it to local storage
     let savedContent = null;
     showMessage("loading", "Loading document...", 0);
     const token = localStorage.getItem("supabaseToken");
@@ -94,6 +91,11 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
           "Content-Type": "application/json",
         },
       });
+
+      if (!response.ok) {
+        throw new Error("HTTP error! status: " + response.status);
+      }
+
       const data = await response.json();
       savedContent = data.content;
       showMessage("success", "Document loaded.");
@@ -101,24 +103,20 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     } catch (error) {
       showMessage("error", "Could not load document from server. Please try again later.");
       //savedContent = localStorage.getItem(LOCAL_STORAGE_KEY); // 不再尝试加载本地缓存
+      throw error;
     }
   
-    if (savedContent) {
+    if (savedContent) { // if there is content retrieved from server, load it into editor
       const parsedContent = editor.parseEditorState(JSON.parse(savedContent)); // convert back to editor state
       editor.update(() => {
         editor.setEditorState(parsedContent);
-        /* const parser = new DOMParser();
-        const parsedContent = parser.parseFromString(savedContent, "text/html");
-        const nodes = $generateNodesFromDOM(editor, parsedContent)
-        $getRoot().clear();
-        $getRoot().append(...nodes); */
       });
     } else {
       console.log("no content")
     }
   };
 
-  const saveDocument = async () => {  // when needed save document to both local storage and server
+  const saveDocument = async () => {  // save document (the local storaged one??) to DB
     const content = localStorage.getItem(LOCAL_STORAGE_KEY);
     const token = localStorage.getItem("supabaseToken");
     //console.log("sending content:", content);
@@ -142,16 +140,22 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     }
   };
 
-  useEffect(() => {
-    // load document
+  useEffect(() => { // define when to load and save document
+
+    // load document - do it whenever editor mounts
     const loadAndSetFlag = async () => {
-      await loadDocument(); 
-      setIsLoaded(true);
+      try {
+        await loadDocument();  // if here throw any error, won't execute the following code
+        setIsLoaded(true);
+      } catch (error) {
+        console.error("Document is not loaded, isloaded flag is false:", error);
+      }
     };
     loadAndSetFlag();
-   
+
+    // save document - do it when events trigger (visibilitychange, beforeunload, every 5 minutes, unmount)
     const handleSave = () => {
-      if (isLoaded) {
+      if (isLoaded) { // only save when editor is loaded
         console.log("save document triggered by useEffect");
         saveDocument();
       }
@@ -159,9 +163,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
 
     window.addEventListener("beforeunload", handleSave); // save document on window close event
     window.addEventListener("visibilitychange", handleSave); // save document on tab change
-
-    // save every 5 minutes
-    const autoSaveInterval = setInterval(() => {
+    const autoSaveInterval = setInterval(() => { // save every 5 minutes
       handleSave();
     }, 5 * 60 * 1000); 
     
@@ -169,6 +171,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       if (isLoaded) {
         handleSave(); // save document on unmount
       };
+      // clear
       window.removeEventListener("beforeunload", handleSave);
       window.removeEventListener("visibilitychange", handleSave);
       clearInterval(autoSaveInterval);
