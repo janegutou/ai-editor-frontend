@@ -134,7 +134,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     if (!token || content.length === 0) return; // if no token or content is empty, do nothing
 
     //console.log("sending content:", content);
-    console.log("sending content type:", typeof content);
+    //console.log("sending content type:", typeof content);
     try {
       const response = await fetch(`${apiUrl}/save_document`, {
         method: "POST",
@@ -162,9 +162,9 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     try {
       await loadDocument();  // if here throw any error, won't execute the following code
       isLoadedRef.current = true;
-      console.log("Document is loaded, isloaded flag is true.");
+      //console.log("Document is loaded, isloaded flag is true.");
     } catch (error) {
-      console.error("Document is not loaded, isloaded flag is false:", error);
+      //console.error("Document is not loaded, isloaded flag is false:", error);
       isLoadedRef.current = false;
     }
   };
@@ -176,9 +176,10 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       const content = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (content.length !== lastSavedRef.current) { // compare with last saved content to avoid unnecessary save
         saveDocument(content);
-      } else {
-        console.log("Document is already saved. Do not need to save again.");
-      }      
+      } 
+      //else {
+      //  console.log("Document is already saved. Do not need to save again.");
+      //}      
     }
   };
 
@@ -189,29 +190,29 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       showMessage("warning", "Network connection lost.");
     };
 
-    console.log("first load");
+    //console.log("first load");
     debouncedLoad(); // first load
 
     // network listerers
     window.addEventListener("online", () => {
-      console.log("reloading document as network is back");
+      //console.log("reloading document as network is back");
       debouncedLoad;
     }); // if network is back, reload document
     window.addEventListener("offline", handleOffline); // if network offline, set isloaded flag to false:
 
     // event listeners
     window.addEventListener("beforeunload", () => {
-      console.log("beforeunload, save triggered");
+      //console.log("beforeunload, save triggered");
       handleSave(); 
     }); 
     window.addEventListener("visibilitychange", () => { 
       if (document.visibilityState === "hidden") {
-        console.log("tab change, save triggered");
+        //console.log("tab change, save triggered");
         handleSave();
       }
     }); 
     const autoSaveInterval = setInterval(() => {
-      console.log("5 minutes auto save triggered");
+      //console.log("5 minutes auto save triggered");
       handleSave();
     }, 5 * 60 * 1000); 
     
