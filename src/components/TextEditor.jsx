@@ -62,11 +62,19 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     info: "text-gray-700",
   };
 
-  const showMessage = (type, text, duration = 5000) => {
+  let timer = null; // use a timer to clear prev message
+  const showMessage = (type, text="\u00A0", duration = 5000) => {
+    // clear prev timeout
+    clearTimeout(timer);
+    
+    // set new message
     setMessageStatus({ type, text });
     //console.log(messageStatus)
+
     if (duration) {
-      setTimeout(() => setMessageStatus({ type: "info", text: "\u00A0" }), duration);
+      timer = setTimeout(() => {
+        setMessageStatus({ type: "info", text: "\u00A0" });
+      }, duration);
     }
   };
     

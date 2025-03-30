@@ -330,6 +330,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
       // 3. 插入生成的文本
       if (data.generated_text) {
         //console.log("Generated text:", data.generated_text);
+        showMessage("info"); // clear prev message
         let newParagraphKey = null;
         editor.update(
           () => {
@@ -378,7 +379,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         requestAnimationFrame(() => {
           editor.update(() => {
             const newParagraph = $getNodeByKey(newParagraphKey);
-            console.log("newParagraph:", newParagraph, newParagraphKey);
+            //console.log("newParagraph:", newParagraph, newParagraphKey);
             if (newParagraph) {
               newParagraph.getChildren().forEach(child => applyAIDOMStyles(child, editor));
             }
@@ -388,6 +389,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         localStorage.setItem("remainingTokens", data.tokens);   // update remaining tokens to local storage
       } else {
         console.log("No generated text");
+        showMessage("error", "Failed to generate content.")
       }
     } catch (error) {
       console.error("Error:",error);
