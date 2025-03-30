@@ -10,7 +10,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { HeadingNode } from "@lexical/rich-text"; 
 import { ListItemNode, ListNode } from "@lexical/list"; 
 import Toolbar from "./Toolbar";
-import { debounce } from "lodash";
+import { debounce, last, set } from "lodash";
 
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -48,11 +48,15 @@ const initialConfig = {
 
 const EditorContainer = ({userOptions, toggleCustomize}) => {
 
+  const LOCAL_STORAGE_KEY = "editorContent"; // temporary storage key
+
   const [editor] = useLexicalComposerContext();
   const [editorContent, setEditorContent] = useState("");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const LOCAL_STORAGE_KEY = "editorContent"; // temporary storage key
   const [messageStatus, setMessageStatus] = useState({ type: "info", text: "\u00A0" });  // 初始化有一个空白占位
+
+  const lastSavedRef = useRef(0); // use ref to keep the latest value in memory
+  const isLoadedRef = useRef(false); // use ref to keep the latest value in memory
+
 
   const messageTypeToColor = { // define the message type mapping to colors
     loading: "text-blue-700",
@@ -63,7 +67,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
   };
 
   let timer = null; // use a timer to clear prev message
-  const showMessage = (type, text="\u00A0", duration = 5000) => {
+  const showMessage = (type, text="\u00A0", duration = 4000) => {
     // clear prev timeout
     clearTimeout(timer);
     
@@ -124,11 +128,13 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     }
   };
 
-  const saveDocument = async () => {  // save document (the local storaged one??) to DB
-    const content = localStorage.getItem(LOCAL_STORAGE_KEY);
+  const saveDocument = async (content) => {  // save document (the local storaged one??) to DB
+
     const token = localStorage.getItem("supabaseToken");
+    if (!token || content.length === 0) return; // if no token or content is empty, do nothing
+
     //console.log("sending content:", content);
-    //console.log("sending content type:", typeof content);
+    console.log("sending content type:", typeof content);
     try {
       const response = await fetch(`${apiUrl}/save_document`, {
         method: "POST",
@@ -142,51 +148,70 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       
       if (response.ok) {
         console.log("Document saved to server.");
+        lastSavedRef.current = content.length; // update last saved content
+        return true;
       }
+      throw new Error("Save failed");
     } catch (error) {
       showMessage("error", "Could not save document to server. Please check network connection.");
     }
   };
 
-  const handleSave = useCallback(() => { // useCallback to prevent 闭包问题
-    if (isLoaded) {
-      console.log("save document triggered by useEffect");
-      saveDocument();
-    }
-  }, [isLoaded]);
 
   const loadAndSetFlag = async () => {
     try {
       await loadDocument();  // if here throw any error, won't execute the following code
-      setIsLoaded(true);
+      isLoadedRef.current = true;
+      console.log("Document is loaded, isloaded flag is true.");
     } catch (error) {
       console.error("Document is not loaded, isloaded flag is false:", error);
-      setIsLoaded(false);
+      isLoadedRef.current = false;
     }
   };
   
   const debouncedLoad = useRef(debounce(loadAndSetFlag, 5000)).current // debounce to prevent too many loading requests; use ref to keep the latest function in memory
 
+  const handleSave = () => {
+    if (isLoadedRef.current) {
+      const content = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (content.length !== lastSavedRef.current) { // compare with last saved content to avoid unnecessary save
+        saveDocument(content);
+      } else {
+        console.log("Document is already saved. Do not need to save again.");
+      }      
+    }
+  };
 
   useEffect(() => { // define when to load and save document
 
     const handleOffline = () => {
-      setIsLoaded(false);
+      isLoadedRef.current = false;
       showMessage("warning", "Network connection lost.");
     };
 
+    console.log("first load");
     debouncedLoad(); // first load
 
     // network listerers
-    window.addEventListener("online", debouncedLoad); // if network is back, reload document
+    window.addEventListener("online", () => {
+      console.log("reloading document as network is back");
+      debouncedLoad;
+    }); // if network is back, reload document
     window.addEventListener("offline", handleOffline); // if network offline, set isloaded flag to false:
 
     // event listeners
-    window.addEventListener("beforeunload", handleSave); // save document on window close event
-    window.addEventListener("visibilitychange", () => { // save document on tab change (add criteria to avoid frequent save)
-      if (document.visibilityState === "hidden") handleSave();
+    window.addEventListener("beforeunload", () => {
+      console.log("beforeunload, save triggered");
+      handleSave(); 
     }); 
-    const autoSaveInterval = setInterval(() => { // save every 5 minutes
+    window.addEventListener("visibilitychange", () => { 
+      if (document.visibilityState === "hidden") {
+        console.log("tab change, save triggered");
+        handleSave();
+      }
+    }); 
+    const autoSaveInterval = setInterval(() => {
+      console.log("5 minutes auto save triggered");
       handleSave();
     }, 5 * 60 * 1000); 
     
@@ -200,7 +225,8 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
       clearInterval(autoSaveInterval);
       debouncedLoad.cancel(); // must cancel debounced function to prevent memory leak
     };
-  }, [editor, isLoaded, handleSave, debouncedLoad]);
+  }, [editor]); 
+
 
   return (    
     <div className="max-w-5xl mx-auto bg-white p-2 pt-8 h-[calc(100vh-6rem)] flex flex-col">      
