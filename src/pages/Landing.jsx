@@ -169,7 +169,7 @@ const LandingPage = () => {
 
 
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section 
       <section className="py-20 bg-[#F8F9F9]">
         <div className="max-w-4xl mx-auto px-4">
           
@@ -229,7 +229,7 @@ const LandingPage = () => {
             Average rating: 4.9/5 from 1,200+ reviews
           </div>
         </div>
-      </section> 
+      </section> */}
 
       {/* Final CTA Section */}
       <section className="relative py-20 bg-gradient-to-br from-secondary-dark to-secondary text-white overflow-hidden">
