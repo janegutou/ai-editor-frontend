@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaLeaf, FaPen, FaMagic, FaStar, FaTerminal, FaCog} from "react-icons/fa";
+import { FaLeaf, FaPen, FaMagic, FaCog, FaBolt, FaStar} from "react-icons/fa";
+import { BiExpand } from "react-icons/bi";
+import { RiEdit2Line, RiAiGenerate } from "react-icons/ri";
 
 
 const LandingPage = () => {
@@ -9,25 +11,45 @@ const LandingPage = () => {
 
   const features = [
     {
-      icon: '⚡', 
+      icon: <FaBolt/>,
       title: "Smart Expansion",
       desc: "Transform brief outlines into detailed content with AI augmentation.",
-      color: "text-green-500"
+      color: "text-secondary"
     },
     {
-      icon: '🔄', 
+      icon: <FaPen/>,
       title: "Style Rewriting",
       desc: "Revise and polish your text while preserving core meaning.",
-      color: "text-green-400"
+      color: "text-secondary"
     },
     {
-      icon: '🔧', 
+      icon: <FaCog/>,
       title: "Custom Prompts",
       desc: "Tailor writing with customizable prompts to generate text as per your style.",
-      color: "text-amber-500" 
+      color: "text-secondary"
     }
   ];
 
+  const steps = [
+    {
+      step: "1",
+      title: "Input Your Text",
+      desc: "Paste or type your initial content",
+      icon: <FaPen className="text-[#27AE60]" />
+    },
+    {
+      step: "2", 
+      title: "Select AI Mode",
+      desc: "Choose expansion, rewriting or free generation",
+      icon: <FaCog className="text-[#27AE60]" />
+    },
+    {
+      step: "3",
+      title: "Get Enhanced Content",
+      desc: "Receive AI-generated versions instantly",
+      icon: <FaMagic className="text-[#27AE60]" />
+    }
+  ]
 
   return (
     <div className="bg-white text-gray-900 font-sans">
@@ -96,7 +118,7 @@ const LandingPage = () => {
                   {feature.icon}
                 </div>
                 <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-                  <span className="border-b-2 border-[#27AE60] pb-1">{feature.title}</span>
+                  <span className="border-b-4 border-[#27AE60] pb-1">{feature.title}</span>
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
                   {feature.desc}
@@ -106,6 +128,7 @@ const LandingPage = () => {
           </div>
         </div>
       </section>
+
 
 
       {/* How it Works Section */}
@@ -122,57 +145,31 @@ const LandingPage = () => {
           </div>
 
           {/* 步骤容器 */}
-          <div className="space-y-12">
-            {[
-              {
-                step: "1",
-                title: "Input Your Text",
-                desc: "Paste or type your initial content",
-                icon: <FaPen className="text-[#27AE60]" />
-              },
-              {
-                step: "2", 
-                title: "Select AI Mode",
-                desc: "Choose expansion, rewriting or free generation",
-                icon: <FaCog className="text-[#27AE60]" />
-              },
-              {
-                step: "3",
-                title: "Get Enhanced Content",
-                desc: "Receive multiple AI-generated versions instantly",
-                icon: <FaMagic className="text-[#27AE60]" />
-              }
-            ].map((step, index) => (
-              <div 
-                key={index}
-                className="flex items-start gap-6 bg-white p-6 rounded-lg hover:bg-[#F8F9F9] transition-colors"
-              >
-                {/* 步骤编号 */}
-                <div className="flex-shrink-0 w-12 h-12 bg-[#27AE60]/10 rounded-full flex items-center justify-center">
-                  <span className="text-[#27AE60] font-bold text-lg">{step.step}</span>
-                </div>
-                
-                {/* 内容区 */}
-                <div>
-                  <div className="flex items-center mb-2">
-                    {step.icon}
-                    <h3 className="text-xl font-semibold text-gray-800 ml-3">
-                      {step.title}
-                    </h3>
+
+          <div className="relative">
+            {/* 时间线装饰 - 改用树叶分隔 */}
+            <div className="hidden md:block absolute left-1/2 top-0 h-full w-0.5 bg-gradient-to-b from-[#27AE60] to-[#F39C12] transform -translate-x-1/2"></div>
+            
+            {steps.map((step, i) => (
+              <div key={i} className={`relative mb-16 ${i%2===0 ? 'md:pr-48' : 'md:pl-48'}`}>
+                <div className="bg-[#F8F9F9] p-6 rounded-lg border border-[#D5F5E3] relative">
+                  <div className="absolute -top-5 left-5 w-10 h-10 bg-[#27AE60] rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                    {step.number}
                   </div>
-                  <p className="text-gray-600 pl-9">
-                    {step.desc}
-                  </p>
+                  <h3 className="text-xl font-bold mb-2 text-[#27AE60]">{step.title}</h3>
+                  <p className="text-[#7F8C8D]">{step.desc}</p>
                 </div>
               </div>
             ))}
           </div>
+
+
         </div>
       </section>
 
 
 
-      {/* Testimonials Section
+      {/* Testimonials Section */}
       <section className="py-20 bg-[#F8F9F9]">
         <div className="max-w-4xl mx-auto px-4">
           
@@ -232,7 +229,7 @@ const LandingPage = () => {
             Average rating: 4.9/5 from 1,200+ reviews
           </div>
         </div>
-      </section>  */}
+      </section> 
 
       {/* Final CTA Section */}
       <section className="relative py-20 bg-gradient-to-br from-secondary-dark to-secondary text-white overflow-hidden">

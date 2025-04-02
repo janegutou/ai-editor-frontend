@@ -11,10 +11,11 @@ import TermsOfService from "./pages/TermsOfService";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 
 function App() {
+  const location = useLocation();
   const { user } = useAuth();
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const toggleCustomize = (state) => {
@@ -37,48 +38,46 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <div className="flex flex-col h-screen font-sans"> 
-        <Navbar />
+    <div className="flex flex-col h-screen font-sans"> 
+      <Navbar />
 
-        <Routes>
-          {/* landing page */}
-          <Route path="/" element={<Langding />} />
+      <Routes>
+        {/* landing page */}
+        <Route path="/" element={<Langding />} />
 
-          {/* other pages */ }          
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/refund-policy" element={<RefundPolicy />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-of-service" element={<TermsOfService />} />
+        {/* other pages */ }          
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/refund-policy" element={<RefundPolicy />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
 
-          {/* login pages */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+        {/* login pages */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* editor page */}
-          <Route path="/editor" element={
-            user ? (
-              <div className="flex flex-1">
-                <Sidebar 
-                  userOptions={userOptions}
-                  updateUserOption={updateUserOption}
-                  toggleCustomize={toggleCustomize}
-                  isCustomizeOpen={isCustomizeOpen}
-                /> 
-                <div className="flex-1 px-6">
-                  <TextEditor userOptions={userOptions} toggleCustomize={toggleCustomize}/>
-                </div>
+        {/* editor page */}
+        <Route path="/editor" element={
+          user ? (
+            <div className="flex flex-1">
+              <Sidebar 
+                userOptions={userOptions}
+                updateUserOption={updateUserOption}
+                toggleCustomize={toggleCustomize}
+                isCustomizeOpen={isCustomizeOpen}
+              /> 
+              <div className="flex-1 px-6">
+                <TextEditor userOptions={userOptions} toggleCustomize={toggleCustomize}/>
               </div>
-            ) : (
-              <Navigate to="/login" />
-            )}
-          />
-          
-        </Routes>
+            </div>
+          ) : (
+            <Navigate to="/login" />
+          )}
+        />
+        
+      </Routes>
 
-        {location.pathname !== "/editor" && <Footer />}
-      </div>
-    </BrowserRouter>
+      {location.pathname !== "/editor" && <Footer />}
+    </div>
   );
 }
 
