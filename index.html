@@ -10,5 +10,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <script type="text/javascript">
+      Paddle.Environment.set("sandbox");
+      Paddle.Initialize({ 
+        token: "test_4c4f6ed2ca263e3fb9736bdbac1" // replace with a client-side token 
+        //<meta http-equiv="Content-Security-Policy" content="script-src 'self' https://cdn.paddle.com/; worker-src 'self' blob:;"> 
+      });
+      //define 
+    </script>
   </body>
 </html>

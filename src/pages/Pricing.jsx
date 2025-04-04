@@ -1,6 +1,12 @@
-import React from 'react';
+import { React } from 'react';
+import { useNavigate } from "react-router-dom";
+
+
 
 const Pricing = () => {
+
+  const navigate = useNavigate();
+
   return (
     <div className="bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto text-center">
@@ -16,7 +22,10 @@ const Pricing = () => {
                 <h2 className="text-2xl font-semibold text-gray-900 min-h-[64px]">Free Trial</h2>
                 <p className="flex-grow mt-4 text-gray-600">Sign up and get 1000 tokens for free to experience our service!</p>
                 
-                <button className="mt-6 w-full py-3 px-6 bg-secondary text-white font-semibold rounded-lg hover:bg-primary transition duration-300 ">
+                <button 
+                  className="mt-6 w-full py-3 px-6 bg-secondary text-white font-semibold rounded-lg hover:bg-primary transition duration-300 "
+                  onClick={() => navigate('/login')}
+                >
                 Start Free
                 </button>
             </div>
@@ -25,7 +34,10 @@ const Pricing = () => {
             <div className="bg-white shadow-lg rounded-2xl p-8 w-[320px] flex flex-col">
                 <h2 className="text-2xl font-semibold text-gray-900 min-h-[64px]">Recharge <br /> $10 = 1000 tokens</h2>
                 <p className="flex-grow mt-4 text-gray-600">Ideal for users who frequently use the AI Assistant. Offers a reasonable price and flexible usage options.</p>
-                <button className="mt-6 w-full py-3 px-6 bg-white border-4 border-secondary text-secondary font-bold shadow-md rounded-lg hover:bg-[#FFFF99] transition duration-300">
+                <button 
+                  className="mt-6 w-full py-3 px-6 bg-white border-4 border-secondary text-secondary font-bold shadow-md rounded-lg hover:bg-[#FFFF99] transition duration-300"
+                  onClick={() => navigate('/billing')} 
+                >
                 Recharge Now
                 </button>
             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthProvider";
-import { FaSignOutAlt } from "react-icons/fa";
+import { BiUser, BiLogOut, BiCube, BiCoinStack } from "react-icons/bi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 
@@ -31,6 +31,12 @@ const Navbar = () => {
         </Link>
       </div>
 
+      {/* 中间导航栏 */}
+      <div className="hidden md:flex items-center space-x-6 ml-auto pr-16">
+        <Link to="/editor" className="text-gray-600 hover:text-secondary text-md font-bold">Workspace</Link>
+        <Link to="/pricing" className="text-gray-600 hover:text-secondary text-md font-bold">Pricing</Link>
+      </div>
+
       {/* 右侧 登录/登出状态 */}
       <div className="relative">
         {user ? (
@@ -48,22 +54,29 @@ const Navbar = () => {
 
             {/* toggle 菜单 */}
             {menuOpen && (
-              <div className="absolute z-50 right-0 top-full mt-2 p-2 w-56 bg-white text-gray-800 border border-gray-200 shadow-lg rounded-lg">
+              <div className="absolute z-50 right-0 top-full mt-2 p-2 w-60 bg-white text-gray-600 border border-gray-200 shadow-lg rounded-lg">
+                             
+                <button
+                  className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-200 rounded-lg"
+                >
+                  <BiUser className="flex-shrink-0 mr-3 h-5 w-5" />  
+                  <p className="truncate">{user.email}</p>
+                </button>
                 
-                { /* if too long email, add ellipsis */}
-                <div className="px-4 py-2 text-sm text-gray-700 truncate">
-                  {user.email} 
-                </div>
-                
-                
-                <div className="px-4 py-2 text-sm text-gray-700">
-                  {tokens && <p>Tokens: {tokens}</p>} 
-                </div>
+                <button
+                  onClick={() => navigate("/billing")}
+                  className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-200 rounded-lg"
+                >
+                  <BiCoinStack className="flex-shrink-0 mr-3 h-5 w-5" />
+                  <p className="truncate">{tokens}</p>
+                </button>
+
+
                 <button
                   onClick={signOut}
-                  className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-200"
+                  className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-200 rounded-lg"
                 >
-                  <FaSignOutAlt className="mr-2" />
+                  <BiLogOut className="flex-shrink-0 mr-3 h-5 w-5" />
                   Log Out
                 </button>
               </div>

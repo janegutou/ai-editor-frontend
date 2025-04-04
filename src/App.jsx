@@ -1,8 +1,12 @@
-import { useAuth } from "./context/AuthProvider"
+import { useState } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 import TextEditor from "./components/TextEditor";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+
 import Langding from "./pages/Landing";
 import Pricing from "./pages/Pricing";
 import RefundPolicy from "./pages/RefundPolicy";
@@ -10,13 +14,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
-import { useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import Billing from "./pages/Billing";
+
 
 
 function App() {
   const location = useLocation();
-  const { user } = useAuth();
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const toggleCustomize = (state) => {
     setIsCustomizeOpen((prev) => (state !== undefined ? state : !prev));
@@ -42,22 +45,22 @@ function App() {
       <Navbar />
 
       <Routes>
-        {/* landing page */}
-        <Route path="/" element={<Langding />} />
-
-        {/* other pages */ }          
+        {/* public pages */}
+        <Route path="/" element={<Langding />} /> 
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/refund-policy" element={<RefundPolicy />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/billing" element={<Billing />} />
 
-        {/* login pages */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-
-        {/* editor page */}
-        <Route path="/editor" element={
-          user ? (
+        {/* protected pages */}
+        <Route element={<ProtectedRoute />}>
+                    
+          <Route path="/billing" element={<Billing />} />
+          {/* editor page */}
+          <Route path="/editor" element={
             <div className="flex flex-1">
               <Sidebar 
                 userOptions={userOptions}
@@ -69,11 +72,9 @@ function App() {
                 <TextEditor userOptions={userOptions} toggleCustomize={toggleCustomize}/>
               </div>
             </div>
-          ) : (
-            <Navigate to="/login" />
-          )}
-        />
-        
+          } />
+
+        </Route>
       </Routes>
 
       {location.pathname !== "/editor" && <Footer />}
