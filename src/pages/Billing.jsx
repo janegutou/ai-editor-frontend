@@ -5,9 +5,8 @@ import { useAuth } from "../context/AuthProvider";
 //const PADDLE_VENDOR_ID = 29398; // test vendor id
 
 const Billing = () => {
-  const [balance, setBalance] = useState(10.0);
-  const [credits, setCredits] = useState(12850); // TODO: CHANGE to get credits from supabase db
-
+  const [credits, setCredits] = useState( localStorage.getItem("remainingTokens") || null) ; // use local storage to initialize the credits
+  const [transactions, setTransactions] = useState([]);
   const { user } = useAuth();
 
   // product price items
@@ -35,14 +34,44 @@ const Billing = () => {
     },
   ];
 
-  const handleTopUp = (priceId, amount) => {
+  const fetchBilling = async () => {
+    try {
+      const token = localStorage.getItem("supabaseToken");
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/billing`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch billing data");
+
+      const data = await response.json();
+      setCredits(data.balance || 0);
+      localStorage.setItem("remainingTokens", data.balance); // save to local storage
+      setTransactions(data.transactions || []);
+    } catch (err) {
+      console.error("Error fetching billing data:", err);
+    }
+  };
+
+  useEffect(() => {
+      if (user) {
+      fetchBilling();
+    }
+  }, [user]);
+  
+
+  const handleTopUp = (priceId) => {
     window.Paddle.Checkout.open({
       items: [{priceId: priceId, quantity: 1}],
       customer: {email: user.email}, 
       customData: {user_id: user.id, email: user}, // TODO: to pass the actual user_id and email to paddle
-      successCallback: (data) => {
-        console.log("Payment succeeded", data);
-        setBalance((prev) => prev + amount);
+      successCallback: async () => {
+        console.log("Payment succeeded");
+        // after 2 seconds, request billing data again to update the balance
+        await new Promise((res) => setTimeout(res, 2000));
+        fetchBilling();
+        toast.success("Top-up successful!");
       },
       closeCallback: () => {
         console.log("Checkout closed");
@@ -78,7 +107,7 @@ const Billing = () => {
               <button
                 key={item.id}
                 className="group border border-gray-200 rounded-lg p-4 hover:border-green-500 transition-all duration-200 hover:shadow-md"
-                onClick={() => handleTopUp(item.id, parseInt(item.amount))}
+                onClick={() => handleTopUp(item.id)}
               >
                 <div className="flex flex-col items-center">
                   <span className="text-2xl font-bold text-gray-800 group-hover:text-green-600">{item.label}</span>
@@ -120,6 +149,44 @@ const Billing = () => {
             View all transactions →
           </button>
         </div>
+          
+        {/* Recent Transactions option 2 */}
+        <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Transactions</h3>
+          <div className="space-y-4">
+            {transactions.length === 0 ? (
+              <p className="text-gray-400">No recent transactions</p>
+            ) : (
+              transactions.map((txn, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center py-3 border-b border-gray-100"
+                >
+                  <div>
+                    <p className="font-medium">{ txn.tx_type.toUpperCase() }</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(txn.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                  <p
+                    className={
+                      txn.tx_type === "top-up"
+                        ? "text-green-600 font-medium"
+                        : "text-red-500 font-medium"
+                    }
+                  >
+                    {txn.tx_type === "top-up" ? "+" : "-"}
+                    ${txn.amount.toLocaleString()}, {txn.token_amount.toLocaleString()} credits
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+          <button className="mt-4 text-green-600 hover:text-green-700 text-sm font-medium">
+            View all transactions →
+          </button>
+        </div>
+
 
         {/* Help Text */}
         <div className="p-6 text-gray-400">
