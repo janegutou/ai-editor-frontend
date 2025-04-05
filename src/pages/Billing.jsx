@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthProvider";
+
 
 //const PADDLE_VENDOR_ID = 29398; // test vendor id
 
 const Billing = () => {
   const [balance, setBalance] = useState(10.0);
-  const [credits, setCredits] = useState(12850); // 直接使用credits作为状态
+  const [credits, setCredits] = useState(12850); // TODO: CHANGE to get credits from supabase db
+
+  const { user } = useAuth();
 
   // product price items
   const items = [
@@ -34,8 +38,8 @@ const Billing = () => {
   const handleTopUp = (priceId, amount) => {
     window.Paddle.Checkout.open({
       items: [{priceId: priceId, quantity: 1}],
-      customer: {email: "user@example.com"},
-      customData: {user_id: "user_id", email: "user@example.com", price_id: priceId}, // TODO: pass user id for webhook matching; to check the format
+      customer: {email: user.email}, 
+      customData: {user_id: user.id, email: user}, // TODO: to pass the actual user_id and email to paddle
       successCallback: (data) => {
         console.log("Payment succeeded", data);
         setBalance((prev) => prev + amount);
