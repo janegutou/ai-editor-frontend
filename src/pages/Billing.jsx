@@ -35,6 +35,7 @@ const Billing = () => {
     window.Paddle.Checkout.open({
       items: [{priceId: priceId, quantity: 1}],
       customer: {email: "user@example.com"},
+      customData: {user_id: "user_id", email: "user@example.com", price_id: priceId}, // TODO: pass user id for webhook matching; to check the format
       successCallback: (data) => {
         console.log("Payment succeeded", data);
         setBalance((prev) => prev + amount);
