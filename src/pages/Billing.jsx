@@ -65,7 +65,7 @@ const Billing = () => {
     window.Paddle.Checkout.open({
       items: [{priceId: priceId, quantity: 1}],
       customer: {email: user.email}, 
-      customData: {user_id: user.id, email: user}, // TODO: to pass the actual user_id and email to paddle
+      customData: {user_id: user.id, email: user.email}, // TODO: to pass the actual user_id and email to paddle
       successCallback: async () => {
         console.log("Payment succeeded");
         // after 2 seconds, request billing data again to update the balance
