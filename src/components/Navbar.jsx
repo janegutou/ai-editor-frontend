@@ -11,7 +11,7 @@ const Navbar = () => {
   const [tokens, setTokens] = useState( localStorage.getItem("remainingTokens") || null);
 
   const handleMenuToggle = () => {
-    setTokens(localStorage.getItem("remainingTokens"));
+    setTokens(Number(localStorage.getItem("remainingTokens")).toLocaleString());
     setMenuOpen(!menuOpen);
   };
 

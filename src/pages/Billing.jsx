@@ -6,7 +6,7 @@ import { BsGem } from 'react-icons/bs';
 //const PADDLE_VENDOR_ID = 29398; // test vendor id
 
 const Billing = () => {
-  const [credits, setCredits] = useState( localStorage.getItem("remainingTokens") || null) ; // use local storage to initialize the credits
+  const [credits, setCredits] = useState( Number(localStorage.getItem("remainingTokens")).toLocaleString() || null) ; // use local storage to initialize the credits
   const [transactions, setTransactions] = useState([]);
   const { user } = useAuth();
 
@@ -16,22 +16,22 @@ const Billing = () => {
       id: "pri_01jqwy9mp2aw1vmnq68yc9zvp0", 
       amount: 5, 
       label: "$5", 
-      credits: "500 credits",
-      calls: "≈ 50k words" 
+      credits: "5,000 credits",
+      calls: "≈ 1,000 AI generations"  // 500 次调用生成
     },
     { 
       id: "pri_01jqwy2gavsm89a15sezkaet24", 
       amount: 10, 
       label: "$10", 
-      credits: "1,050 credits",
-      calls: "≈ 105k words" 
+      credits: "10,500 credits",
+      calls: "≈ 2,100 AI generations" 
     },
     { 
       id: "pri_01jqwy8yntga8hrcyw3rrv384x", 
       amount: 20, 
       label: "$20", 
-      credits: "2,200 credits",
-      calls: "≈ 220k words" 
+      credits: "22,000 credits",
+      calls: "≈ 4,400 AI generations" 
     },
   ];
 
@@ -185,7 +185,8 @@ const Billing = () => {
 
         {/* Help Text */}
         <div className="p-6 text-gray-400">
-          <p>• 1 credit ≈ 100 English words</p>
+          <p>• 1 AI generation ≈ 2-10 credits (varies by model and length)</p>
+          <p>• Different models cost different amounts of credits</p>
           <p>• Both input and output text consume credits</p>
           <p>• Credits never expire</p>
           <p>• All purchases are final</p>

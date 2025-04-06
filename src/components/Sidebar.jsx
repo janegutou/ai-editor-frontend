@@ -41,7 +41,7 @@ const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOp
             AI Model
           </h2>
           <select
-            className="p-2 mr-2 mb-2 bg-secondary text-white rounded-lg"
+            className="p-2 ml-5 mb-2 bg-secondary text-white rounded-lg"
             value={userOptions.selectedModel}
             onChange={(e) => updateUserOption("selectedModel", e.target.value)}
           >
@@ -66,7 +66,7 @@ const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOp
             </h2>
 
             {isCustomizeOpen && (
-              <div className="mt-2 space-y-4 pl-2 ml-5 border-l-0 border-gray-100">
+              <div className="mt-2 space-y-4 ml-5 border-l-0 border-gray-100">
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">TONE</label>
                   <input
