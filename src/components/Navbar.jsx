@@ -6,6 +6,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
+  const isAdmin = user?.role === "admin";
   const [menuOpen, setMenuOpen] = useState(false);
   const [tokens, setTokens] = useState( localStorage.getItem("remainingTokens") || null);
 
@@ -33,6 +34,9 @@ const Navbar = () => {
 
       {/* 中间导航栏 */}
       <div className="hidden md:flex items-center space-x-6 ml-auto pr-16">
+        {isAdmin && (
+          <Link to="/admin" className="text-gray-600 hover:text-secondary text-md font-bold">Admin Panel</Link>
+        )}
         <Link to="/editor" className="text-gray-600 hover:text-secondary text-md font-bold">Workspace</Link>
         <Link to="/pricing" className="text-gray-600 hover:text-secondary text-md font-bold">Pricing</Link>
       </div>

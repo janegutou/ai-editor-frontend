@@ -15,6 +15,7 @@ import TermsOfService from "./pages/TermsOfService";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Billing from "./pages/Billing";
+import Unauthorized from "./pages/Unauthorized";
 
 
 
@@ -54,8 +55,9 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/billing" element={<Billing />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
-        {/* protected pages */}
+        {/* needs login */}
         <Route element={<ProtectedRoute />}>
                     
           <Route path="/billing" element={<Billing />} />
@@ -73,8 +75,15 @@ function App() {
               </div>
             </div>
           } />
-
         </Route>
+
+        {/* administator pages */}
+        <Route element={<ProtectedRoute adminOnly={true} />}>
+          <Route path="/admin" element={<div>Admin Page Placeholder</div>} />
+        </Route>
+
+
+
       </Routes>
 
       {location.pathname !== "/editor" && <Footer />}

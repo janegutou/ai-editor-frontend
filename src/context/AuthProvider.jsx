@@ -20,10 +20,16 @@ export function AuthProvider({ children }) {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
-          setUser(session.user);
           localStorage.setItem("supabaseToken", session.access_token); // save token to local storage
           console.log("User is signed in: ", session.user.id)
-          await ensureUserInDatabase(); 
+
+          const userData = await ensureUserInDatabase();  // additional user data like tokens, role, etc.
+          // combine with auth user data
+          setUser({
+            ...session.user,
+            tokens: userData?.tokens,
+            role: userData?.role,
+          });          
         } else {
           setUser(null);
           localStorage.removeItem("supabaseToken"); // remove token from local storage when user signs out
@@ -128,9 +134,16 @@ export function AuthProvider({ children }) {
 
       const data = await response.json();
       //console.log("User details stored in local storage:", data);
-      localStorage.setItem("remainingTokens", data.tokens); // 同步本地缓存, can add others when needed
+      localStorage.setItem("remainingTokens", data.tokens); 
+      
+      // add to leverage user role data
+      return {
+        tokens: data.tokens,
+        role: data.role,
+      };
     } catch (error) {
       console.error(error);
+      return null;
     }
   }
 
