@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
-
+import { FiArrowRight, FiRepeat, FiClock, FiDollarSign, FiCreditCard, FiZap, FiAward } from 'react-icons/fi';
+import { BsGem } from 'react-icons/bs';
 
 //const PADDLE_VENDOR_ID = 29398; // test vendor id
 
@@ -99,7 +100,10 @@ const Billing = () => {
 
         {/* Top Up Section */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Purchase Credits</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <FiCreditCard className="w-5 h-5 mr-2 text-green-600" />
+            Purchase Credits
+          </h3>
           <p className="text-gray-600 mb-6">Select a package to add to your balance</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -121,72 +125,63 @@ const Billing = () => {
 
         {/* Recent Transactions */}
         <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Transactions</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
-              <div>
-                <p className="font-medium">Credit Purchase</p>
-                <p className="text-sm text-gray-500">Today, 10:30 AM</p>
-              </div>
-              <p className="text-green-600 font-medium">+1,000 credits</p>
-            </div>
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
-              <div>
-                <p className="font-medium">API Usage</p>
-                <p className="text-sm text-gray-500">Yesterday, 3:45 PM</p>
-              </div>
-              <p className="text-red-500 font-medium">-250 credits</p>
-            </div>
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
-              <div>
-                <p className="font-medium">Credit Purchase</p>
-                <p className="text-sm text-gray-500">May 28, 2024</p>
-              </div>
-              <p className="text-green-600 font-medium">+2,200 credits</p>
-            </div>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+              <FiRepeat className="w-5 h-5 mr-2 text-green-600" />
+              Recent Transactions
+            </h3>
+            <button className="text-gray-500 hover:text-gray-600 text-sm font-medium flex items-center">
+              View all
+              <FiArrowRight className="w-4 h-4 ml-1" />
+            </button>
           </div>
-          <button className="mt-4 text-green-600 hover:text-green-700 text-sm font-medium">
-            View all transactions →
-          </button>
-        </div>
-          
-        {/* Recent Transactions option 2 */}
-        <div className="mt-8 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Transactions</h3>
-          <div className="space-y-4">
-            {transactions.length === 0 ? (
-              <p className="text-gray-400">No recent transactions</p>
-            ) : (
-              transactions.map((txn, index) => (
+
+          {transactions.length === 0 ? (
+            <div className="py-8 text-center">
+              <FiClock className="mx-auto h-12 w-12 text-gray-400" />
+              <p className="mt-2 text-sm font-medium text-gray-500">No transactions yet</p>
+              <p className="text-xs text-gray-400">Your transaction history will appear here</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {transactions.slice(0, 3).map((txn, index) => ( // only show the first 3 transactions
                 <div
                   key={index}
-                  className="flex justify-between items-center py-3 border-b border-gray-100"
+                  className="flex justify-between items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
                 >
-                  <div>
-                    <p className="font-medium">{ txn.tx_type.toUpperCase() }</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(txn.created_at).toLocaleString()}
+                  <div className="flex items-center">
+                    <div className="p-2 rounded-full bg-green-50 text-primary">
+                      {txn.tx_type === 'top-up' ? (
+                        <FiZap className="w-5 h-5" />
+                      ) : (
+                        <BsGem className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div className="ml-4">
+                      <p className="font-medium text-gray-800 capitalize">{txn.tx_type}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(txn.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-green-600"> {/* Always green */}
+                      +${txn.amount.toLocaleString()} {/* Always show + */}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      +{txn.token_amount.toLocaleString()} credits
                     </p>
                   </div>
-                  <p
-                    className={
-                      txn.tx_type === "top-up"
-                        ? "text-green-600 font-medium"
-                        : "text-red-500 font-medium"
-                    }
-                  >
-                    {txn.tx_type === "top-up" ? "+" : "-"}
-                    ${txn.amount.toLocaleString()}, {txn.token_amount.toLocaleString()} credits
-                  </p>
                 </div>
-              ))
-            )}
-          </div>
-          <button className="mt-4 text-green-600 hover:text-green-700 text-sm font-medium">
-            View all transactions →
-          </button>
+              ))}
+            </div>
+          )}
         </div>
-
 
         {/* Help Text */}
         <div className="p-6 text-gray-400">
