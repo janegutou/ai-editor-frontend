@@ -54,7 +54,6 @@ function App() {
         <Route path="/refund-policy" element={<RefundPolicy />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/billing" element={<Billing />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* needs login */}
