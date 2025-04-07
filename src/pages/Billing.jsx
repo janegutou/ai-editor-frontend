@@ -144,7 +144,7 @@ const Billing = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {transactions.slice(0, 3).map((txn, index) => ( // only show the first 3 transactions
+              {transactions.slice(-3).reverse().map((txn, index) => ( // only show the last 3 transactions, and in reverse order
                 <div
                   key={index}
                   className="flex justify-between items-center p-4 hover:bg-gray-50 rounded-lg transition-colors"
