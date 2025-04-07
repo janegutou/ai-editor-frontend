@@ -6,6 +6,7 @@ import TextEditor from "./components/TextEditor";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 import Langding from "./pages/Landing";
 import Pricing from "./pages/Pricing";
