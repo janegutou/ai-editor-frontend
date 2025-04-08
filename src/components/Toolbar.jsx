@@ -211,6 +211,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   };
 
   const applyAIDOMStyles = (node, editor) => {
+    // this function is used to apply styles to the AI generated content's list item markers - if any
     if (node.getType() === 'listitem') {
       const element = editor.getElementByKey(node.__key);
       //console.log("element:", element);
@@ -225,8 +226,10 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   };
 
   const applyAITextStyle = (node) => {
+    // this function is used to apply styles to the AI generated content's text nodes
+    // including the background color, font color, and font size
     if (node.getType() === 'text') {
-      node.setStyle("background-color: #FFF5CC; color: rgb(105, 108, 112); font-size: 16px"); // TBD: 16 or 14px?
+      node.setStyle("background-color: #F0FFF0; color: rgb(105, 108, 112); font-size: 16px"); // TBD: 16 or 14px?
     } 
     if (node.getChildren) {// recursively apply styles to children
       node.getChildren().forEach(child => applyAITextStyle(child)); 
