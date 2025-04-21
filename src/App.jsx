@@ -17,7 +17,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import Billing from "./pages/Billing";
 import Unauthorized from "./pages/Unauthorized";
-
+import Feedback from "./pages/Feedback";
 
 
 function App() {
@@ -60,7 +60,8 @@ function App() {
         {/* needs login */}
         <Route element={<ProtectedRoute />}>
                     
-          <Route path="/billing" element={<Billing />} />
+          <Route path="/billing" element={<Billing />} />        
+          <Route path="/feedback" element={<Feedback />} />
           {/* editor page */}
           <Route path="/editor" element={
             <div className="flex flex-1">

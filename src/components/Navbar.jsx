@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthProvider";
-import { BiUser, BiLogOut, BiCube, BiCoinStack } from "react-icons/bi";
+import { BiUser, BiLogOut, BiCube, BiCoinStack, BiMessageDetail } from "react-icons/bi";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
 
@@ -75,6 +75,15 @@ const Navbar = () => {
                   <p className="truncate">{tokens}</p>
                 </button>
 
+                <button
+                  onClick={() => navigate("/feedback")}
+                  className="flex items-center w-full px-4 py-2 text-left hover:bg-gray-200 rounded-lg"
+                >
+                  <BiMessageDetail className="flex-shrink-0 mr-3 h-5 w-5" />
+                  Feedback
+                </button>
+
+                <hr className="my-1" />
 
                 <button
                   onClick={signOut}
