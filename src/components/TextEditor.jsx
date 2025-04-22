@@ -177,7 +177,7 @@ const EditorContainer = ({userOptions, toggleCustomize}) => {
     }
   };
   
-  const debouncedLoad = useRef(debounce(loadAndSetFlag, 5000)).current // debounce to prevent too many loading requests; use ref to keep the latest function in memory
+  const debouncedLoad = useRef(debounce(loadAndSetFlag, 1000)).current // debounce to prevent too many loading requests; use ref to keep the latest function in memory
 
   const handleSave = () => {
     if (isLoadedRef.current) {

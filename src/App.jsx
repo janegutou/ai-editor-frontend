@@ -28,18 +28,26 @@ function App() {
   }; 
 
   const [userOptions, setUserOptions] = useState({
-    selectedModel: "LLAMA3",
+    selectedModel: "LLAMA3", 
     tone: "",
     style: "",
     audience: "",
     customerPrompt: ""
   });
 
+  useEffect(() => { // 从 localStorage 加载（组件首次挂载时执行）
+    const savedOptions = localStorage.getItem("userOptions");
+    if (savedOptions) {
+      setUserOptions((prev) => ({...prev,...JSON.parse(savedOptions)}))
+    }
+  }, []);
+
   const updateUserOption = (key, value) => {
-    setUserOptions((prev) => ({
-      ...prev,
-      [key]: value
-    }));
+    setUserOptions((prev) => {
+      const updated = {...prev, [key]: value};
+      localStorage.setItem("userOptions", JSON.stringify(updated));
+      return updated;
+    }); 
   };
 
   return (
