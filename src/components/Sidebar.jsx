@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ userOptions, updateUserOption, toggleCustomize, isCustomizeOpen}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const models = ["GROK3", "GROK3-mini", "GPT-4o-mini", "GEMINI", "DEEPSEEK", "LLAMA3"]
+  const models = ["GROK3", "GPT-4o-mini", "GEMINI", "DEEPSEEK", "LLAMA3"]
   const sidebarOpen = isOpen || isCustomizeOpen;
   const navigate = useNavigate();
 
