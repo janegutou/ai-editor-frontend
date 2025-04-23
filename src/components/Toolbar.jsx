@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $setBlocksType, $patchStyleText } from '@lexical/selection';
-import { $getSelection, $isRangeSelection, UNDO_COMMAND,  REDO_COMMAND, $createParagraphNode, $createTextNode, $isTextNode, $isParagraphNode, $getNearestNodeFromDOMNode, $getNodeByKey } from "lexical";
-import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND } from "@lexical/list";
+import { $getSelection, $isRangeSelection, $getRoot, $isElementNode, UNDO_COMMAND,  REDO_COMMAND, $createParagraphNode, $createTextNode, $isTextNode, $isParagraphNode, $isRootNode, $getNearestNodeFromDOMNode, $getNodeByKey } from "lexical";
+import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND, $isListItemNode, $isListNode } from "@lexical/list";
 import { $getNearestBlockElementAncestorOrThrow} from '@lexical/utils';
 import { useCallback, useState, useEffect } from "react";
 import { $createHeadingNode, $isQuoteNode, $isHeadingNode } from '@lexical/rich-text';
@@ -25,7 +25,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
   const ColorPicker = CompactPicker; // 选择器组件
 
   const handleBgColorChange = (color) => {
-    console.log("color:", color)
+    //console.log("color:", color)
     setBgColor(color.hex);
   };
 
@@ -191,7 +191,7 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
       case "background-color": color = bgColor; break;
       case "color": color = ftColor; break;
     }
-    console.log("Apply", styleType, "to color", color);
+    //console.log("Apply", styleType, "to color", color);
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -239,45 +239,88 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
 
   const undo = () => editor.dispatchCommand(UNDO_COMMAND, undefined);
   const redo = () => editor.dispatchCommand(REDO_COMMAND, undefined);
-  
-  const getEditorText = () => {  // 获取编辑器文本，并插入标记
+
+
+  const getEditorText = () => {
     let fullText = "";
     let markedText = "";
     let startOffset = null;
-    let endOffset =  null;
+    let endOffset = null;
     let globalOffset = 0;
-
+  
     editor.getEditorState().read(() => {
-      const root = editor.getRootElement();
-      if (root) {
-        const nodes = root.childNodes;
-        const selection = window.getSelection();            
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          //console.log(range);
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) {
+        return;
+      }
+  
+      const anchor = selection.anchor;
+      const focus = selection.focus;
+      const isBackward = selection.isBackward();
+  
+      // 确定选区开始和结束的位置
+      const selectionStart = isBackward ? focus : anchor;
+      const selectionEnd = isBackward ? anchor : focus;
+  
+      // 递归遍历所有节点，并构建带格式的文本
+      function traverseNodes(node) {
+        if ($isTextNode(node)) {
+          const nodeText = node.getTextContent();
 
+          // 检查是否是选区开始/结束节点
+          if (node === selectionStart.getNode()) {
+            startOffset = globalOffset + selectionStart.offset;
+          }
+          if (node === selectionEnd.getNode()) {
+            endOffset = globalOffset + selectionEnd.offset;
+          }
 
-          // iter all nodes to get full text offset 
-          for (const node of nodes) {
-            const nodeText = node.textContent || "";      
+          fullText += nodeText;
+          globalOffset += nodeText.length;
+        } 
+        else if ($isListNode(node)) { // 处理列表（ul/ol）
+          const children = node.getChildren();
+          const listType = node.getListType(); // "bullet" | "number" | "check"
+          
+          for (let i = 0; i < children.length; i++) {
+            const listItem = children[i];
+            if ($isListItemNode(listItem)) {
+              // 添加列表标记（• 或 1. 2. 3.）
+              if (listType === "bullet") {
+                fullText += "• ";
+              } else if (listType === "number") {
+                fullText += `${i + 1}. `;
+              }
+              globalOffset += 2; // 调整偏移量（• 和空格占2字符）
 
-            if (node.contains(range.startContainer)) { // 如果选区在当前节点开始
-              startOffset = globalOffset + range.startOffset;
+              // 递归处理列表项内容
+              traverseNodes(listItem);
+              
+              // 每个列表项后加换行
+              fullText += "\n";
+              globalOffset += 1;
             }
-            if (node.contains(range.endContainer)) { // 如果选区在当前节点结束
-              endOffset = globalOffset + range.endOffset;
-            }
-
-            //console.log(startOffset, endOffset, globalOffset);
-            fullText += nodeText;
-            globalOffset += nodeText.length;
+          }
+        } 
+        else if ($isElementNode(node)) { // 其他元素（如段落、div）
+          const children = node.getChildren();
+          for (const child of children) {
+            traverseNodes(child);
+          }
+          
+          // 非列表元素后加换行（可选）
+          if (!node.isInline()) {
+            fullText += "\n";
+            globalOffset += 1;
           }
         }
       }
+
+      traverseNodes($getRoot());
     });
 
-    
-    // 如果有选区，插入标记
+  
+    // 插入标记
     if (startOffset !== null && endOffset !== null && startOffset !== endOffset) {
       const selectedText = fullText.slice(startOffset, endOffset);
       markedText = 
@@ -285,29 +328,25 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         `[[SELECTED]]${selectedText}[[/SELECTED]]` +
         fullText.slice(endOffset);
     }
-    // 如果没有选区，标注光标位置
     else if (startOffset !== null && startOffset === endOffset) {
       markedText = 
         fullText.slice(0, startOffset) +
         `[[CURSOR]]` +
         fullText.slice(startOffset);
     }
-    // 如果没有选区也没有光标，返回原文
     else {
       markedText = fullText;
     }
-
+  
     return markedText;
   };
-
-
 
   const generateAIContent = async (selectedMode) => {
     showMessage("loading", "AI is generating...", 0);
 
     // 1. 获取文本
     const contextText = getEditorText();
-    //console.log(contextText);
+    //console.log("All document text:", contextText);
 
     try {
       // 2. 向后端发送请求
@@ -331,8 +370,8 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
       const data = await response.json();
       
       // 3. 插入生成的文本
-      if (data.generated_text) {
-        //console.log("Generated text:", data.generated_text);
+      /*if (data.generated_text) {
+        console.log("Generated text:", data.generated_text);
         showMessage("info"); // clear prev message
         let newParagraphKey = null;
         editor.update(
@@ -390,6 +429,63 @@ const Toolbar = ({userOptions, toggleCustomize, showMessage}) => {
         });
         
         localStorage.setItem("remainingTokens", data.tokens);   // update remaining tokens to local storage
+      } */
+      if (data.generated_text) {
+        //console.log("Generated text:", data.generated_text);
+        showMessage("info");
+      
+        editor.update(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return;
+      
+          // 1. 获取当前选区的最外层容器节点
+          const anchorNode = selection.anchor.getNode();
+          let container = $getNearestBlockElementAncestorOrThrow(anchorNode);
+      
+          // 2. 转换Markdown为Lexical节点
+          const html = marked(data.generated_text);
+          const parser = new DOMParser();
+          const dom = parser.parseFromString(`<div>${html}</div>`, "text/html");
+          const markdownNodes = $generateNodesFromDOM(editor, dom);
+      
+          // 3. 创建纯段落容器
+          const newParagraph = $createParagraphNode();
+          markdownNodes.forEach(node => {
+            applyAITextStyle(node);
+            newParagraph.append(node);
+          });
+      
+          // 4. 强制插入到列表外部（关键修改）
+          if ($isListNode(container) || $isListItemNode(container)) {
+            // 找到列表的最外层父级
+            while (container && !$isRootNode(container.getParent())) {
+              container = container.getParent();
+            }
+            container.insertAfter(newParagraph);
+          } else {
+            // 普通情况直接插入
+            container.insertAfter(newParagraph);
+          }
+      
+          // 5. 聚焦到新内容
+          newParagraph.selectEnd();
+        });
+      
+        // 延迟样式应用
+        requestAnimationFrame(() => {
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              selection.getNodes().forEach(node => {
+                if ($isTextNode(node)) {
+                  applyAIDOMStyles(node, editor);
+                }
+              });
+            }
+          });
+        });
+      
+        localStorage.setItem("remainingTokens", data.tokens);
       } else {
         console.log("No generated text");
         showMessage("error", "Failed to generate content")

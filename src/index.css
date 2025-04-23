@@ -7,7 +7,7 @@
   }
 
 .editor-paragraph {
-  margin: 0 0 15px 0;
+  margin: 0 0 16px 0;
   position: relative;
 }
 
@@ -21,12 +21,21 @@ li::marker {
 .editor-list-ol {
   list-style-type: decimal;
   padding-left: 20px;
+  margin: 0 0 16px 0;
 }
 
+.editor-list-ol li { /* 列表项之间的间距 */
+  margin: 0 0 6px 0;
+}
 
 .editor-list-ul {
   list-style-type: disc;
   padding-left: 25px;
+  margin: 0 0 16px 0; /* 上右下左 */
+}
+
+.editor-list-ul li { /* 列表项之间的间距 */
+  margin: 0 0 6px 0;
 }
 
 .editor-bold {
@@ -48,7 +57,7 @@ li::marker {
 .editor-h1 {
     display: block;
     font-size: 2em;
-    margin: 0.67em 0;
+    margin: 28px 0; 
     font-weight: bold;
     color: #008000;
 }
@@ -56,13 +65,13 @@ li::marker {
 .editor-h2 {
     display: block;
     font-size: 1.5em;
-    margin: 0.83em 0;
+    margin: 22px 0; 
     font-weight: bold;
 }
 
 .editor-h3 {
     display: block;
     font-size: 1.17em;
-    margin: 1em 0;
+    margin: 20px 0;
     font-weight: bold;
 }
