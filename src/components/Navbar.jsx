@@ -23,12 +23,12 @@ const Navbar = () => {
   return (
     <nav className="px-6 py-2 flex justify-between items-center border-b">
       {/* 左侧 Logo + 名称 + click direct to home */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
         <Link to = "/">
-          <img src="/writyzen.png" alt="Logo" className="h-10" />
+          <img src="/writyzen.png" alt="Logo" className="h-9" />
         </Link> 
         < Link to = "/">
-          <span className="text-lg pt-1 font-bold text-secondary">AI Writing Assistant</span>   
+          <span className="text-xl pt-1 font-bold text-secondary">WrityZen</span>   
         </Link>
       </div>
 
