@@ -129,11 +129,9 @@ const LandingPage = () => {
         </div>
       </section>
 
-
-
       {/* How it Works Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           {/* 简洁标题 */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-[#2C3E50] mb-4">
@@ -144,24 +142,39 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* 步骤容器 */}
-
-          <div className="relative">
-            {/* 时间线装饰 - 改用树叶分隔 */}
-            <div className="hidden md:block absolute left-1/2 top-0 h-full w-0.5 bg-gradient-to-b from-[#27AE60] to-[#F39C12] transform -translate-x-1/2"></div>
-            
-            {steps.map((step, i) => (
-              <div key={i} className={`relative mb-16 ${i%2===0 ? 'md:pr-48' : 'md:pl-48'}`}>
-                <div className="bg-[#F8F9F9] p-6 rounded-lg border border-[#D5F5E3] relative">
-                  <div className="absolute -top-5 left-5 w-10 h-10 bg-[#27AE60] rounded-full flex items-center justify-center text-white font-bold shadow-md">
-                    {step.number}
+          {/* 步骤容器 包含step图示和GIF展示 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {/* 步骤step图示 -- 在左侧*/}
+            <div className="relative">
+              {/* 时间线装饰 - 改用树叶分隔 */}
+              <div className="hidden md:block absolute left-1/2 top-0 h-full w-0.5 bg-gradient-to-b from-[#27AE60] to-[#F39C12] transform -translate-x-1/2"></div>
+              
+              {steps.map((step, i) => (
+                <div key={i} className={`relative mb-16 ${i%2===0 ? 'md:pr-48' : 'md:pl-48'}`}>
+                  <div className="bg-[#F8F9F9] p-6 rounded-lg border border-[#D5F5E3] relative">
+                    <div className="absolute -top-5 left-5 w-10 h-10 bg-[#27AE60] rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                      {step.number}
+                    </div>
+                    <h3 className="text-xl font-bold mb-2 text-[#27AE60]">{step.title}</h3>
+                    <p className="text-[#7F8C8D]">{step.desc}</p>
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-[#27AE60]">{step.title}</h3>
-                  <p className="text-[#7F8C8D]">{step.desc}</p>
                 </div>
+              ))}
+            </div>
+
+            {/* GIF展示 -- 在右侧 */}
+            <div className="mb-16 mx-auto w-full"> {/* 控制宽度 */}
+              <div className="bg-white rounded-lg border border-gray-200 shadow-lg">
+                <img 
+                  src="/expand_sample.gif" 
+                  alt="Software Demo" 
+                  className="rounded-lg w-full h-auto"
+                  loading="lazy"
+                />
               </div>
-            ))}
+            </div>
           </div>
+
 
 
         </div>

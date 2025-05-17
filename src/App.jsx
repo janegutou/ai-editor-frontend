@@ -18,6 +18,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Billing from "./pages/Billing";
 import Unauthorized from "./pages/Unauthorized";
 import Feedback from "./pages/Feedback";
+import Demo from "./pages/Demo";
 
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/demo" element={<Demo />} />
 
         {/* needs login */}
         <Route element={<ProtectedRoute />}>

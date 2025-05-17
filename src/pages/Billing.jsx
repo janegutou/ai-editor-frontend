@@ -185,7 +185,7 @@ const Billing = () => {
 
         {/* Help Text */}
         <div className="p-6 text-gray-400">
-          <p>• 1 AI generation ≈ 2-10 credits (varies by model and length)</p>
+          <p>• 1 AI generation ≈ 1-5 credits (varies by model and length)</p>
           <p>• Different models cost different amounts of credits</p>
           <p>• Both input and output text consume credits</p>
           <p>• Credits never expire</p>
